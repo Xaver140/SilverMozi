@@ -1,19 +1,11 @@
-import { Link } from "react-router-dom";
+
+import Navbar from "../components/Navbar";
 
 export default function Fooldal() {
   return (
     <div>
-      <h1>🎬 Szaftos Mozi</h1>
-
-      <p>Üdvözlünk a mozi foglalási rendszerben.</p>
-
-      <div>
-        <Link to="/filmek">Filmek megtekintése</Link>
-      </div>
-
-      <div>
-        <Link to="/login">Bejelentkezés</Link>
-      </div>
+        <Navbar/>
+      <p>Üdvözlünk az oldalon</p>
     </div>
   );
 }

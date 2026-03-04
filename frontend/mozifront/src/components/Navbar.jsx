@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
-import SearchBar from "./SearchBar";
+import { getUserRole } from "../utils/auth";
 
-export default function Navbar({ search, setSearch, isAdmin }) {
+export default function Navbar() {
+
+  const role = getUserRole();
+
   const logout = () => {
     localStorage.removeItem("token");
     window.location.href = "/";
@@ -11,27 +14,29 @@ export default function Navbar({ search, setSearch, isAdmin }) {
     <nav style={{
       display: "flex",
       justifyContent: "space-between",
-      alignItems: "center",
-      padding: "10px 20px",
+      padding: "10px",
       borderBottom: "1px solid gray"
     }}>
 
-      <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-        <h2>🎬 Mozi</h2>
-
+      <div style={{ display: "flex", gap: "20px" }}>
         <Link to="/">Főoldal</Link>
         <Link to="/filmek">Filmek</Link>
-        <Link to="/profil">Profil</Link>
 
-        {isAdmin && <Link to="/admin">Admin</Link>}
-      </div>
-
-      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-        {search !== undefined && (
-          <SearchBar search={search} setSearch={setSearch} />
+        {role === "admin" && (
+          <Link to="/admin">Admin</Link>
         )}
 
-        <button onClick={logout}>Kijelentkezés</button>
+        {role && <Link to="/profil">Profil</Link>}
+      </div>
+
+      <div>
+        {role ? (
+          <button onClick={logout}>Kijelentkezés</button>
+        ) : (
+          <Link to="/login">
+            <button>Bejelentkezés</button>
+          </Link>
+        )}
       </div>
 
     </nav>

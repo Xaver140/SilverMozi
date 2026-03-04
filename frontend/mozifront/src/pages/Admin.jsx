@@ -79,7 +79,7 @@ export default function Adminkezelo() {
 
   return (
     <div>
-      <Navbar search={search} setSearch={setSearch} />
+      <Navbar search={search} setSearch={setSearch} isAdmin={true} />
       <h1>Admin - Film kezelés</h1>
 
       <h3>{editingId ? "Film szerkesztése" : "Új film hozzáadása"}</h3>
@@ -95,9 +95,9 @@ export default function Adminkezelo() {
       </button>
 
       <hr />
-      {/* Searchbar fimekhez */}
       <div>
       <h3>Filmek listája</h3>
+      {/* Searchbar fimekhez */}
       <SearchBar search={search} setSearch={setSearch} />
       </div>
       <table border="1">
