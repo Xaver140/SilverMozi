@@ -19,7 +19,7 @@ export default function Login() {
       const role = getUserRole();
 
       if (role === "admin") navigate("/admin");
-      else navigate("/user");
+      else navigate("/filmek");
 
     } catch (err) {
       alert("Hibás bejelentkezés");
