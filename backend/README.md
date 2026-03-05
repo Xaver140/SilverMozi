@@ -22,6 +22,7 @@ A backend működéséhez szükséges csomagok telepítéséhez futtassa az alá
 
 ```bash
 npm install bcrypt cors dotenv express jsonwebtoken mysql2
+vagy
 npm install
 ```
 
