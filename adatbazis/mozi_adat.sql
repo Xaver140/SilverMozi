@@ -3,14 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2026. Feb 04. 22:47
+-- Létrehozás ideje: 2026. Már 05. 00:32
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
-CREATE DATABASE IF NOT EXISTS `mozi_adat`
-  DEFAULT CHARACTER SET utf8mb4
-  COLLATE utf8mb4_general_ci;
-
-USE `mozi_adat`;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -38,7 +33,9 @@ CREATE TABLE `filmek` (
   `description` text DEFAULT NULL,
   `duration_minutes` int(11) NOT NULL,
   `release_year` year(4) DEFAULT NULL,
+  `szinesz` varchar(100) NOT NULL,
   `genre` varchar(100) DEFAULT NULL,
+  `film_img` longtext NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -46,15 +43,15 @@ CREATE TABLE `filmek` (
 -- A tábla adatainak kiíratása `filmek`
 --
 
-INSERT INTO `filmek` (`film_id`, `title`, `description`, `duration_minutes`, `release_year`, `genre`, `is_active`) VALUES
-(1, 'A Gyűrűk Ura: A Gyűrű Szövetsége', 'Egy hobbit vállalja a végzetes küldetést, hogy megsemmisítsen egy varázsgyűrűt.', 178, '2001', 'Fantasy', 1),
-(2, 'Forrest Gump', 'Egy jó szívű alabamai férfi lenyűgöző utazása a 20. századi amerikai történelemben.', 142, '1994', 'Dráma', 1),
-(3, 'Inception', 'Egy tolvaj, aki behatol az álmokba, kap egy lehetetlen feladatot: egy ötlet elültetését.', 148, '2010', 'Sci-Fi', 1),
-(4, 'Admin Teszt Film', 'Admin felvétel', 100, '2025', 'Dráma', 1),
-(5, 'Interstellar', 'Űrutazás az emberiség megmentéséért.', 169, '2014', 'Sci-Fi', 1),
-(6, 'Mátrix', 'A valóság nem az, aminek látszik.', 136, '1999', 'Sci-Fi', 1),
-(7, 'Titanic', 'Szerelmi történet a Titanic fedélzetén.', 195, '1997', 'Romantikus', 1),
-(8, 'Joker', 'Egy ember lassú lecsúszása az őrületbe.', 122, '2019', 'Dráma', 1);
+INSERT INTO `filmek` (`film_id`, `title`, `description`, `duration_minutes`, `release_year`, `szinesz`, `genre`, `film_img`, `is_active`) VALUES
+(1, 'A Gyűrűk Ura: A Gyűrű Szövetsége', 'Egy hobbit vállalja a végzetes küldetést, hogy megsemmisítsen egy varázsgyűrűt.', 178, '2001', '', 'Fantasy', '', 1),
+(2, 'Forrest Gump', 'Egy jó szívű alabamai férfi lenyűgöző utazása a 20. századi amerikai történelemben.', 142, '1994', '', 'Dráma', '', 1),
+(3, 'Inception', 'Egy tolvaj, aki behatol az álmokba, kap egy lehetetlen feladatot: egy ötlet elültetését.', 148, '2010', '', 'Sci-Fi', '', 1),
+(4, 'Admin Teszt Film', 'Admin felvétel', 100, '2025', '', 'Dráma', '', 1),
+(5, 'Interstellar', 'Űrutazás az emberiség megmentéséért.', 169, '2014', '', 'Sci-Fi', '', 1),
+(6, 'Mátrix', 'A valóság nem az, aminek látszik.', 136, '1999', '', 'Sci-Fi', '', 1),
+(7, 'Titanic', 'Szerelmi történet a Titanic fedélzetén.', 195, '1997', '', 'Romantikus', '', 1),
+(8, 'Joker', 'Egy ember lassú lecsúszása az őrületbe.', 122, '2019', '', 'Dráma', '', 1);
 
 -- --------------------------------------------------------
 
@@ -221,7 +218,10 @@ INSERT INTO `users` (`user_id`, `email`, `password_hash`, `full_name`, `phone_nu
 (7, 'user1@mozi.hu', '$2b$10$hSNyk8F5j/ucEkHn1CWwlO8XQJcveUWSO9a.AVelxh9j.RVJArhLK', 'Kiss Péter', '+3611111111', 0),
 (8, 'user2@mozi.hu', '$2b$10$hSNyk8F5j/ucEkHn1CWwlO8XQJcveUWSO9a.AVelxh9j.RVJArhLK', 'Tóth Anna', '+3622222222', 0),
 (9, 'user3@mozi.hu', '$2b$10$hSNyk8F5j/ucEkHn1CWwlO8XQJcveUWSO9a.AVelxh9j.RVJArhLK', 'Németh Gábor', '+3633333333', 0),
-(10, 'user4@mozi.hu', '$2b$10$hSNyk8F5j/ucEkHn1CWwlO8XQJcveUWSO9a.AVelxh9j.RVJArhLK', 'Szűcs Dóra', '+3644444444', 0);
+(10, 'user4@mozi.hu', '$2b$10$hSNyk8F5j/ucEkHn1CWwlO8XQJcveUWSO9a.AVelxh9j.RVJArhLK', 'Szűcs Dóra', '+3644444444', 0),
+(11, 'admin@test.hu', '$2b$10$4k2BZ4B9R18Jo2gTeVvq.uuWqfKdWvlQpQrl.7Usyo26xq.K7zkGW', 'Admin User', NULL, 1),
+(12, 'simafel@test.hu', '$2b$10$b0p1iAiwBkSL9HUokVQ3We2aBlbyXZrDddApHeUc0jFxZqvry/wpe', 'felhasz teszt', NULL, 0),
+(13, 'agyverzes@gmail.hu', '$2b$10$OYTfSdNNtTBK3ds7I6JbA.6hahrgSVIpN8YEZx4Y35fjvaHmh.QAq', 'felkötöm magam', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -254,7 +254,19 @@ INSERT INTO `vetites` (`vetites_id`, `film_id`, `terem_id`, `start_time`, `end_t
 (9, 5, 2, '2026-02-11 19:00:00', '2026-02-11 21:50:00', 3000.00),
 (10, 6, 3, '2026-02-12 20:00:00', '2026-02-12 22:20:00', 4200.00),
 (11, 7, 1, '2026-02-13 16:00:00', '2026-02-13 18:15:00', 2200.00),
-(12, 8, 2, '2026-02-14 21:00:00', '2026-02-14 23:30:00', 3500.00);
+(12, 8, 2, '2026-03-05 15:00:00', '2026-02-14 23:30:00', 3500.00),
+(13, 1, 1, '2026-03-05 18:00:00', '2026-03-05 20:58:00', 2200.00),
+(14, 2, 2, '2026-03-05 20:30:00', '2026-03-05 22:52:00', 2500.00),
+(15, 3, 3, '2026-03-06 17:00:00', '2026-03-06 19:28:00', 3500.00),
+(16, 5, 2, '2026-03-06 20:00:00', '2026-03-06 22:49:00', 3000.00),
+(17, 6, 1, '2026-03-07 16:00:00', '2026-03-07 18:16:00', 2400.00),
+(18, 7, 2, '2026-03-07 19:00:00', '2026-03-07 22:15:00', 2600.00),
+(19, 8, 3, '2026-03-08 18:00:00', '2026-03-08 20:02:00', 3200.00),
+(20, 1, 2, '2026-03-08 21:00:00', '2026-03-09 00:00:00', 2800.00),
+(21, 5, 1, '2026-03-09 17:30:00', '2026-03-09 20:19:00', 3000.00),
+(22, 3, 3, '2026-03-09 20:30:00', '2026-03-09 22:58:00', 3500.00),
+(23, 2, 1, '2026-03-10 16:00:00', '2026-03-10 18:22:00', 2200.00),
+(24, 6, 2, '2026-03-10 19:30:00', '2026-03-10 21:46:00', 2800.00);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -350,13 +362,13 @@ ALTER TABLE `ules`
 -- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT a táblához `vetites`
 --
 ALTER TABLE `vetites`
-  MODIFY `vetites_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `vetites_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- Megkötések a kiírt táblákhoz
