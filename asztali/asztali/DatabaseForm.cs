@@ -14,7 +14,7 @@ namespace asztali
 {
     public partial class DatabaseForm : Form
     {
-        string cs = "server=localhost;uid=root;database=mozi_adat;port=3306;pwd=;";
+        string cs = "server=localhost;uid=root;database=mozi_adat;port=3307;pwd=;";
         public DatabaseForm()
         {
             InitializeComponent();
@@ -153,7 +153,7 @@ namespace asztali
                 return;
             }
 
-            var selected = listBox1.SelectedItem.ToString().Split(';')[0];
+            var selected = listBox1.SelectedItem.ToString().Split(';')[0].Trim();
 
             var ok = MessageBox.Show("Biztos törlöd?", "Delete", MessageBoxButtons.YesNo);
             if (ok != DialogResult.Yes) return;
@@ -162,9 +162,13 @@ namespace asztali
             {
                 conn.Open();
 
-                var cmd = new MySqlCommand("DELETE FROM users WHERE full_name='@t'", conn);
-                cmd.Parameters.AddWithValue("@t", selected);
-                cmd.ExecuteNonQuery();
+                using (var cmd = new MySqlCommand("DELETE FROM users WHERE full_name = @t", conn))
+                {
+                    cmd.Parameters.AddWithValue("@t", selected);
+
+                    int rows = cmd.ExecuteNonQuery();
+                    MessageBox.Show($"Törölt sorok száma: {rows}");
+                }
             }
 
             LoadList();
