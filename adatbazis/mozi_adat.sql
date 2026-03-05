@@ -1,3 +1,8 @@
+CREATE DATABASE IF NOT EXISTS `mozi_adat`
+DEFAULT CHARACTER SET utf8mb4
+COLLATE utf8mb4_general_ci;
+
+USE `mozi_adat`;
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
