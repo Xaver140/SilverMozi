@@ -131,7 +131,7 @@ namespace asztali
                 conn.Open();
 
                 var cmd = new MySqlCommand(
-                    "INSERT INTO users(name, phone, email) VALUES(@n,@p,@e)", conn);
+                    "INSERT INTO users(full_name, phone_number, email) VALUES(@n,@p,@e)", conn);
 
                 cmd.Parameters.AddWithValue("@n", name);
                 cmd.Parameters.AddWithValue("@p", phone);
