@@ -1,96 +1,37 @@
 # Mozi vizsgaremek
 ## Csapat tagjai
-Szászik Adrián - Asztali alkalmazás
+Szászik Adrián - Asztali alkalmazás / Adatbázis
 
-Kardos Xavér Noel - Weboldal
+Kardos Xavér Noel - Weboldal(Frontend/Backend) / adatbázis
 
-## A projekt célja
-Egy olyan weboldal és asztali alkalmazás ahol a felhasználó foglalhat egy általa tetszőleges helyet és vásárolhat jegyet egy filmvetítésre. A weboldal könnyen kezelhető és átlátható legyen a felhasználó számára
+## Mozi jegy- és helyfoglaló rendszer
 
-Az oldalon a felhasználó tudjon:
-+ Fiókot létrehozni, szerkeszteni és törölni
-+ A vetítések időpontját megnézheti és kiválaszthatja foglaláshoz
-  - helyfoglalás
-+ Online fizetést/tranzakciót végrehajtani
+A projekt célja egy olyan komplex rendszer létrehozása, amely lehetővé teszi a felhasználók számára, hogy online módon megtekintsék a mozi műsorát, kiválasszák a kívánt vetítést, és helyet foglaljanak a kiválasztott filmre. A rendszer két fő részből áll: egy webes felületből a nézők számára, valamint egy asztali alkalmazásból az adminisztráció kezelésére.
+## Webes felület
+A weboldal a mozi látogatói számára készült, ahol egyszerűen és gyorsan tájékozódhatnak az aktuális vetítésekről. A felhasználók megtekinthetik a mozi műsorlistáját, amely tartalmazza a filmek címét, a vetítés időpontját, valamint az elérhető helyeket.
+
+A rendszer lehetőséget biztosít arra, hogy a felhasználók kiválasszák a kívánt vetítést, majd egy interaktív ülésrenden keresztül lefoglalják a szabad helyeket. A foglalás során a rendszer ellenőrzi a helyek elérhetőségét, így elkerülhető a dupla foglalás.
+
+
+A webes felület fő funkciói:
+
++ Filmek és vetítések listázása
++ Vetítési időpontok megjelenítése
++ Szabad és foglalt helyek megtekintése
++ Helyfoglalás a kiválasztott vetítésre
+
+## Adminisztrációs asztali alkalmazás
+
+A projekt része egy asztali alkalmazás, amely az adminisztrátorok számára biztosít kezelőfelületet a rendszer tartalmának módosítására. Az admin felületen keresztül kezelhetők a filmek és a vetítések adatai.
+
+Az adminisztrátorok lehetőséget kapnak:
+
++ új filmek hozzáadására
++ meglévő filmek adatainak módosítására
++ vetítések létrehozására és szerkesztésére
++ vetítési időpontok kezelésére
+
+Ez az alkalmazás biztosítja, hogy a mozi műsorát gyorsan és hatékonyan lehessen frissíteni, anélkül hogy a weboldal forráskódját módosítani kellene.
 
 > [!NOTE]
 > A készítés közben még változhatnak az elképzelések 
-
-## 📊 Adatbázis ER Diagram
-
-```mermaid
-erDiagram
-
-  FILMEK {
-    int film_id PK
-    varchar title
-    text description
-    int duration_minutes
-    year release_year
-    varchar genre
-    boolean is_active
-  }
-
-  TEREM {
-    int terem_id PK
-    varchar name
-    int total_rows
-    int seats_per_row
-  }
-
-  ULES {
-    int ules_id PK
-    int terem_id FK
-    char row_number
-    int seat_number
-  }
-
-  USERS {
-    int user_id PK
-    varchar email
-    varchar password_hash
-    varchar full_name
-    varchar phone_number
-    boolean is_admin
-  }
-
-  VETITES {
-    int vetites_id PK
-    int film_id FK
-    int terem_id FK
-    datetime start_time
-    datetime end_time
-    decimal base_price
-  }
-
-  KONYVELES {
-    int konyveles_id PK
-    int vetites_id FK
-    int user_id FK
-    int ules_id FK
-    timestamp booking_time
-    decimal final_price
-    string status
-    varchar payment_reference
-  }
-
-  FIZETES {
-    int fizetes_id PK
-    int konyveles_id FK
-    decimal amount
-    string method
-    string status
-    varchar transaction_id
-    timestamp paid_at
-  }
-
-  %% Kapcsolatok
-  FILMEK ||--o{ VETITES : "vetitesek"
-  TEREM  ||--o{ VETITES : "helyszin"
-  TEREM  ||--o{ ULES   : "ulesek"
-
-  USERS  ||--o{ KONYVELES : "foglal"
-  VETITES||--o{ KONYVELES : "foglalasok"
-  ULES   ||--o{ KONYVELES : "ulesre"
-
-  KONYVELES ||--o{ FIZETES : "fizetes"
