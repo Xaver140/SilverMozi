@@ -68,8 +68,8 @@ export default function Szekfog() {
     try {
       await api.post("/foglalas", {
         vetites_id: vetitesId,
-        ules_id: selectedSeats[0].ules_id, // egyelőre 1
-        final_price: 2200
+        ules_ids: selectedSeats.map(s => s.ules_id),
+        final_price: 2200 * selectedSeats.length
       });
 
       alert("Foglalás sikeres!");
