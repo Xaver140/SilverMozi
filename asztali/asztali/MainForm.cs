@@ -15,7 +15,7 @@ namespace asztali
     {
         private readonly ApiClient _api;
 
-        string cs = "server=localhost;uid=root;database=mozi_adat;port=3307;pwd=;";
+        string cs = "server=localhost;uid=root;database=mozi_adat;port=3306;pwd=;";
 
         public MainForm() : this(new ApiClient("http://localhost:3000"))
         {
@@ -101,6 +101,18 @@ namespace asztali
             this.Hide();
 
             using (var f = new FilmEditorForm())
+            {
+                f.ShowDialog();
+            }
+
+            this.Show();
+        }
+
+        private void btnVetites_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+
+            using (var f = new VetitesForm())
             {
                 f.ShowDialog();
             }

@@ -56,6 +56,7 @@
             listBoxFilmek.Size = new Size(327, 424);
             listBoxFilmek.TabIndex = 0;
             listBoxFilmek.Click += listBoxFilmek_SelectedIndexChanged;
+            listBoxFilmek.SelectedIndexChanged += listBoxFilmek_SelectedIndexChanged_1;
             // 
             // label1
             // 

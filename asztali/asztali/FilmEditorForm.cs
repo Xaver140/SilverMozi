@@ -15,7 +15,7 @@ namespace asztali
     public partial class FilmEditorForm : Form
     {
         private int? selectedFilmId = null;
-        string cs = "server=localhost;uid=root;database=mozi_adat;port=3307;pwd=;";
+        string cs = "server=localhost;uid=root;database=mozi_adat;port=3306;pwd=;";
         public FilmEditorForm()
         {
             InitializeComponent();
@@ -284,6 +284,9 @@ namespace asztali
             this.Close();
         }
 
+        private void listBoxFilmek_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
 
+        }
     }
 }

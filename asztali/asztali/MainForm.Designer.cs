@@ -34,6 +34,7 @@
             Adatbázis = new Button();
             listBoxFilmek = new ListBox();
             btnFilmEditor = new Button();
+            btnVetites = new Button();
             SuspendLayout();
             // 
             // btnLoadFilmek
@@ -97,11 +98,22 @@
             btnFilmEditor.UseVisualStyleBackColor = true;
             btnFilmEditor.Click += btnFilmEditor_Click;
             // 
+            // btnVetites
+            // 
+            btnVetites.Location = new Point(711, 266);
+            btnVetites.Name = "btnVetites";
+            btnVetites.Size = new Size(164, 86);
+            btnVetites.TabIndex = 7;
+            btnVetites.Text = "Vetítések";
+            btnVetites.UseVisualStyleBackColor = true;
+            btnVetites.Click += btnVetites_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(914, 600);
+            Controls.Add(btnVetites);
             Controls.Add(btnFilmEditor);
             Controls.Add(listBoxFilmek);
             Controls.Add(Adatbázis);
@@ -123,5 +135,6 @@
         private Button Adatbázis;
         private ListBox listBoxFilmek;
         private Button btnFilmEditor;
+        private Button btnVetites;
     }
 }
