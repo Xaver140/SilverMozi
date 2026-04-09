@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import api from "../api/api";
 
 export default function Profil() {
@@ -108,7 +107,6 @@ export default function Profil() {
 
   return (
     <div>
-      <Navbar />
 
       <div className="container mt-4">
         <h2>Profil</h2>

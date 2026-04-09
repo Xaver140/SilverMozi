@@ -7,22 +7,44 @@ import Register from "./pages/Regisztracio";
 import Filmreszlet from "./pages/Filmreszlet";
 import Szekfog from "./pages/Szekfog";
 import Profil from "./pages/profil";
-import "./App.css";
 import Fizetes from "./pages/Fizetes";
+
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
+import "./App.css";
+
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Fooldal />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<Adminkezelo />} />
-        <Route path="/filmek" element={<Userkezelo />} />
-        <Route path="/profil" element={<Profil />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/film/:id" element={<Filmreszlet />} />
-        <Route path="/foglalas/:vetitesId" element={<Szekfog />} />
-        <Route path="/fizetes" element={<Fizetes/>} />
-      </Routes>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh"
+        }}
+      >
+        {/* NAVBAR MINDENHOL */}
+        <Navbar />
+
+        {/* OLDAL TARTALOM */}
+        <div style={{ flex: 1 }}>
+          <Routes>
+            <Route path="/" element={<Fooldal />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={<Adminkezelo />} />
+            <Route path="/filmek" element={<Userkezelo />} />
+            <Route path="/profil" element={<Profil />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/film/:id" element={<Filmreszlet />} />
+            <Route path="/foglalas/:vetitesId" element={<Szekfog />} />
+            <Route path="/fizetes" element={<Fizetes />} />
+          </Routes>
+        </div>
+
+        {/* FOOTER MINDENHOL */}
+        <Footer />
+      </div>
     </BrowserRouter>
   );
 }

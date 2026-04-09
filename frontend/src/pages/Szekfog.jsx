@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
-import Navbar from "../components/Navbar";
 
 export default function Szekfog() {
   const { vetitesId } = useParams();
@@ -92,7 +91,6 @@ export default function Szekfog() {
 
   return (
     <div>
-      <Navbar />
 
       <div className="container">
         <h2>Székfoglalás</h2>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
-import Navbar from "../components/Navbar";
 
 export default function Filmreszlet() {
   const { id } = useParams();
@@ -28,7 +27,6 @@ export default function Filmreszlet() {
 
   return (
     <div>
-      <Navbar />
 
       <div className="container mt-4">
 

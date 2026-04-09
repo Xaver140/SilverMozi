@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
 import api from "../api/api";
 
 export default function Fizetes(){
@@ -41,7 +40,6 @@ export default function Fizetes(){
     }, [paid]);
     return (
         <div>
-            <Navbar />
             <div className="container">
                 <h2>Fizetés</h2>
 

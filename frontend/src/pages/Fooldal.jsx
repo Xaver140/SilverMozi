@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import api from "../api/api";
 
 export default function Fooldal() {
@@ -24,13 +23,10 @@ export default function Fooldal() {
 
   return (
     <div>
-      <Navbar />
-
       <h2 style={{ textAlign: "center", marginTop: "20px" }}>MŰSORON</h2>
 
       <div style={{ position: "relative", width: "100%" }}>
 
-        {/* BAL NYÍL */}
         <button onClick={() => scroll("left")} style={arrowStyle("left")}>
           ❮
         </button>
@@ -75,7 +71,6 @@ export default function Fooldal() {
           ))}
         </div>
 
-        {/* JOBB NYÍL */}
         <button onClick={() => scroll("right")} style={arrowStyle("right")}>
           ❯
         </button>
