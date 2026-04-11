@@ -39,13 +39,11 @@ export default function Fooldal() {
         </div>
       </div>
       <div className="container mt-5">
-
         <h2 className="mb-4 text-center">Műsoron</h2>
 
         <div className="row">
 
           {films.map(film => (
-
             <div key={film.film_id} className="col-6 col-sm-4 col-md-3 col-lg-2 mb-4">
 
               <div
@@ -55,7 +53,6 @@ export default function Fooldal() {
                   textAlign: "center"
                 }}
               >
-
                 <img
                   src={`/images/${film.film_img}`}
                   alt={film.title}
@@ -70,7 +67,7 @@ export default function Fooldal() {
                   onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
                 />
 
-                {/* CÍM */}
+                {/* cím*/}
                 <p style={{
                   marginTop: "10px",
                   fontWeight: "500"
