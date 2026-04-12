@@ -28,41 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
-            btnLoadFilmek = new Button();
-            label1 = new Label();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             btnBack = new Button();
             Adatbázis = new Button();
-            listBoxFilmek = new ListBox();
-            btnFilmEditor = new Button();
-            btnVetites = new Button();
+            termekToolStripMenuItem = new ToolStripMenuItem();
+            filmekToolStripMenuItem = new ToolStripMenuItem();
+            vetítésekToolStripMenuItem = new ToolStripMenuItem();
+            menuStrip1 = new MenuStrip();
+            menuStrip1.SuspendLayout();
             SuspendLayout();
-            // 
-            // btnLoadFilmek
-            // 
-            btnLoadFilmek.Location = new Point(485, 27);
-            btnLoadFilmek.Margin = new Padding(3, 4, 3, 4);
-            btnLoadFilmek.Name = "btnLoadFilmek";
-            btnLoadFilmek.Size = new Size(206, 196);
-            btnLoadFilmek.TabIndex = 1;
-            btnLoadFilmek.Text = "Filmek betöltése";
-            btnLoadFilmek.UseVisualStyleBackColor = true;
-            btnLoadFilmek.Click += btnLoadFilmek_Click_1;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(471, 515);
-            label1.Name = "label1";
-            label1.Size = new Size(76, 20);
-            label1.TabIndex = 2;
-            label1.Text = "MainForm";
             // 
             // btnBack
             // 
-            btnBack.Location = new Point(45, 375);
+            btnBack.BackgroundImage = Properties.Resources.log_in__2_;
+            btnBack.BackgroundImageLayout = ImageLayout.Zoom;
+            btnBack.Location = new Point(634, 32);
             btnBack.Margin = new Padding(3, 4, 3, 4);
             btnBack.Name = "btnBack";
-            btnBack.Size = new Size(237, 163);
+            btnBack.Size = new Size(118, 69);
             btnBack.TabIndex = 3;
             btnBack.Text = "Bejelentkezés";
             btnBack.UseVisualStyleBackColor = true;
@@ -70,71 +53,76 @@
             // 
             // Adatbázis
             // 
-            Adatbázis.Location = new Point(713, 380);
+            Adatbázis.BackgroundImage = Properties.Resources.user;
+            Adatbázis.BackgroundImageLayout = ImageLayout.Zoom;
+            Adatbázis.Location = new Point(784, 32);
             Adatbázis.Margin = new Padding(3, 4, 3, 4);
             Adatbázis.Name = "Adatbázis";
-            Adatbázis.Size = new Size(163, 157);
+            Adatbázis.Size = new Size(118, 69);
             Adatbázis.TabIndex = 4;
-            Adatbázis.Text = "Adatbázis";
+            Adatbázis.Text = "Felhasználók";
             Adatbázis.UseVisualStyleBackColor = true;
             Adatbázis.Click += button1_Click;
             // 
-            // listBoxFilmek
+            // termekToolStripMenuItem
             // 
-            listBoxFilmek.FormattingEnabled = true;
-            listBoxFilmek.Location = new Point(14, 27);
-            listBoxFilmek.Margin = new Padding(3, 4, 3, 4);
-            listBoxFilmek.Name = "listBoxFilmek";
-            listBoxFilmek.Size = new Size(463, 324);
-            listBoxFilmek.TabIndex = 5;
+            termekToolStripMenuItem.Name = "termekToolStripMenuItem";
+            termekToolStripMenuItem.Size = new Size(71, 24);
+            termekToolStripMenuItem.Text = "Termek";
+            termekToolStripMenuItem.Click += termekToolStripMenuItem_Click;
             // 
-            // btnFilmEditor
+            // filmekToolStripMenuItem
             // 
-            btnFilmEditor.Location = new Point(749, 36);
-            btnFilmEditor.Name = "btnFilmEditor";
-            btnFilmEditor.Size = new Size(126, 122);
-            btnFilmEditor.TabIndex = 6;
-            btnFilmEditor.Text = "Filmek kezelése";
-            btnFilmEditor.UseVisualStyleBackColor = true;
-            btnFilmEditor.Click += btnFilmEditor_Click;
+            filmekToolStripMenuItem.Name = "filmekToolStripMenuItem";
+            filmekToolStripMenuItem.Size = new Size(66, 24);
+            filmekToolStripMenuItem.Text = "Filmek";
+            filmekToolStripMenuItem.Click += filmekToolStripMenuItem_Click;
             // 
-            // btnVetites
+            // vetítésekToolStripMenuItem
             // 
-            btnVetites.Location = new Point(711, 266);
-            btnVetites.Name = "btnVetites";
-            btnVetites.Size = new Size(164, 86);
-            btnVetites.TabIndex = 7;
-            btnVetites.Text = "Vetítések";
-            btnVetites.UseVisualStyleBackColor = true;
-            btnVetites.Click += btnVetites_Click;
+            vetítésekToolStripMenuItem.Name = "vetítésekToolStripMenuItem";
+            vetítésekToolStripMenuItem.Size = new Size(82, 24);
+            vetítésekToolStripMenuItem.Text = "Vetítések";
+            vetítésekToolStripMenuItem.Click += vetítésekToolStripMenuItem_Click;
+            // 
+            // menuStrip1
+            // 
+            menuStrip1.ImageScalingSize = new Size(20, 20);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { termekToolStripMenuItem, filmekToolStripMenuItem, vetítésekToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(914, 28);
+            menuStrip1.TabIndex = 8;
+            menuStrip1.Text = "menuStrip1";
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackgroundImage = Properties.Resources.mozihero__1_;
+            BackgroundImageLayout = ImageLayout.Zoom;
             ClientSize = new Size(914, 600);
-            Controls.Add(btnVetites);
-            Controls.Add(btnFilmEditor);
-            Controls.Add(listBoxFilmek);
             Controls.Add(Adatbázis);
+            Controls.Add(menuStrip1);
             Controls.Add(btnBack);
-            Controls.Add(label1);
-            Controls.Add(btnLoadFilmek);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MainMenuStrip = menuStrip1;
             Margin = new Padding(3, 4, 3, 4);
             Name = "MainForm";
-            Text = "Main Form";
+            Text = "Fő oldal";
             Load += MainForm_Load;
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-        private Button btnLoadFilmek;
-        private Label label1;
         private Button btnBack;
         private Button Adatbázis;
-        private ListBox listBoxFilmek;
-        private Button btnFilmEditor;
-        private Button btnVetites;
+        private ToolStripMenuItem termekToolStripMenuItem;
+        private ToolStripMenuItem filmekToolStripMenuItem;
+        private ToolStripMenuItem vetítésekToolStripMenuItem;
+        private MenuStrip menuStrip1;
     }
 }

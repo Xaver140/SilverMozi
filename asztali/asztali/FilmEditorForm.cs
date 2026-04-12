@@ -1,292 +1,304 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 using System.IO;
+using System.Windows.Forms;
+using asztali.Models;
+using asztali.Services;
 
 namespace asztali
 {
     public partial class FilmEditorForm : Form
     {
-        private int? selectedFilmId = null;
-        string cs = "server=localhost;uid=root;database=mozi_adat;port=3306;pwd=;";
+        private readonly FilmService _filmService;
+        private List<Film> _filmek;
+        private Film _selectedFilm;
+
         public FilmEditorForm()
         {
             InitializeComponent();
 
-            cmbGenre.Items.Add("Fantasy");
-            cmbGenre.Items.Add("Dráma");
-            cmbGenre.Items.Add("Sci-Fi");
-            cmbGenre.Items.Add("Romantikus");
-            cmbGenre.Items.Add("Akció");
-            cmbGenre.Items.Add("Vígjáték");
-            cmbGenre.Items.Add("Thriller");
-            cmbGenre.Items.Add("Horror");
-        }
+            _filmService = new FilmService();
+            _filmek = new List<Film>();
 
-        private void btnLoadFilms_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                listBoxFilmek.Items.Clear();
+            PrepareControls();
 
-                using (MySqlConnection conn = new MySqlConnection(cs))
-                {
-                    conn.Open();
-
-                    string sql = "SELECT film_id, title FROM filmek ORDER BY title";
-                    MySqlCommand cmd = new MySqlCommand(sql, conn);
-
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            listBoxFilmek.Items.Add(reader["film_id"].ToString() + ";" + reader["title"].ToString());
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Filmek betöltése hiba: " + ex.Message);
-            }
+            this.Load += FilmEditorForm_Load;
         }
 
         private void FilmEditorForm_Load(object sender, EventArgs e)
         {
+            LoadGenreCombo();
+            LoadAgeLimitCombo();
+            LoadFilmek();
+        }
+
+        private void PrepareControls()
+        {
+            pbFilmImage.SizeMode = PictureBoxSizeMode.Zoom;
+            pbFilmImage.BorderStyle = BorderStyle.FixedSingle;
+
+            cmbGenre.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbAgeLimit.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            numDuration.Minimum = 1;
+            numDuration.Maximum = 500;
+
+            numReleaseYear.Minimum = 1900;
+            numReleaseYear.Maximum = 2100;
+
+            rtbActors.ScrollBars = RichTextBoxScrollBars.Vertical;
+            rtbDescription.ScrollBars = RichTextBoxScrollBars.Vertical;
+        }
+
+        private void LoadGenreCombo()
+        {
             cmbGenre.Items.Clear();
-            cmbGenre.Items.Add("Fantasy");
-            cmbGenre.Items.Add("Dráma");
-            cmbGenre.Items.Add("Sci-Fi");
-            cmbGenre.Items.Add("Romantikus");
-            cmbGenre.Items.Add("Akció");
-            cmbGenre.Items.Add("Vígjáték");
-            cmbGenre.Items.Add("Thriller");
-            cmbGenre.Items.Add("Horror");
-
-            ClearForm();
+            cmbGenre.Items.AddRange(new object[]
+            {
+                "Akció",
+                "Dráma",
+                "Fantasy",
+                "Sci-Fi",
+                "Romantikus",
+                "Történelmi",
+                "Vígjáték",
+                "Thriller",
+                "Animációs",
+                "Horror",
+                "Kaland"
+            });
         }
-        private void ClearForm()
-        {
-            selectedFilmId = null;
 
+        private void LoadAgeLimitCombo()
+        {
+            cmbAgeLimit.Items.Clear();
+            cmbAgeLimit.Items.Add("");
+            cmbAgeLimit.Items.Add("0+");
+            cmbAgeLimit.Items.Add("6+");
+            cmbAgeLimit.Items.Add("12+");
+            cmbAgeLimit.Items.Add("16+");
+            cmbAgeLimit.Items.Add("18+");
+        }
+
+        private void LoadFilmek()
+        {
+            try
+            {
+                lstFilmek.Items.Clear();
+                _filmek = _filmService.GetAllFilmek();
+
+                foreach (Film film in _filmek)
+                {
+                    lstFilmek.Items.Add(film);
+                }
+
+                if (lstFilmek.Items.Count > 0)
+                {
+                    lstFilmek.SelectedIndex = 0;
+                }
+                else
+                {
+                    ClearFilmDetails();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hiba a filmek betöltésekor:\n" + ex.Message);
+            }
+        }
+
+        private void lstFilmek_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lstFilmek.SelectedItem is Film film)
+            {
+                _selectedFilm = film;
+                ShowFilmDetails(film);
+            }
+            else
+            {
+                _selectedFilm = null;
+                ClearFilmDetails();
+            }
+        }
+
+        private void ShowFilmDetails(Film film)
+        {
+            txtTitle.Text = film.Title ?? "";
+
+            if (!string.IsNullOrWhiteSpace(film.Genre) && cmbGenre.Items.Contains(film.Genre))
+                cmbGenre.SelectedItem = film.Genre;
+            else
+                cmbGenre.Text = film.Genre ?? "";
+
+            numDuration.Value = film.DurationMinutes > 0 ? film.DurationMinutes : 1;
+
+            if (film.ReleaseYear.HasValue && film.ReleaseYear.Value >= numReleaseYear.Minimum && film.ReleaseYear.Value <= numReleaseYear.Maximum)
+                numReleaseYear.Value = film.ReleaseYear.Value;
+            else
+                numReleaseYear.Value = numReleaseYear.Minimum;
+
+            string ageText = film.AgeLimit.HasValue ? film.AgeLimit.Value + "+" : "";
+            if (cmbAgeLimit.Items.Contains(ageText))
+                cmbAgeLimit.SelectedItem = ageText;
+            else
+                cmbAgeLimit.SelectedIndex = 0;
+
+            txtDirector.Text = film.Director ?? "";
+            txtProducer.Text = film.Producer ?? "";
+            chkIsActive.Checked = film.IsActive;
+
+            rtbActors.Text = film.Actors ?? "";
+            rtbDescription.Text = film.Description ?? "";
+
+            LoadFilmImage(film.FilmImg);
+        }
+
+        private void ClearFilmDetails()
+        {
             txtTitle.Text = "";
-            txtDescription.Text = "";
-            txtDuration.Text = "";
-            txtReleaseYear.Text = "";
             cmbGenre.SelectedIndex = -1;
-
-            chkActive.Checked = false;
-
-            listBoxFilmek.ClearSelected();
+            numDuration.Value = numDuration.Minimum;
+            numReleaseYear.Value = numReleaseYear.Minimum;
+            cmbAgeLimit.SelectedIndex = 0;
+            txtDirector.Text = "";
+            txtProducer.Text = "";
+            chkIsActive.Checked = false;
+            rtbActors.Text = "";
+            rtbDescription.Text = "";
+            pbFilmImage.Image = null;
         }
-        private void LoadFilms()
+
+        private void LoadFilmImage(string fileName)
         {
             try
             {
-                listBoxFilmek.Items.Clear();
+                pbFilmImage.Image = null;
 
-                using (MySqlConnection conn = new MySqlConnection(cs))
+                if (string.IsNullOrWhiteSpace(fileName))
+                    return;
+
+                string imagePath = Path.Combine(Application.StartupPath, "Resources", "Images", fileName);
+
+                if (!File.Exists(imagePath))
+                    return;
+
+                using (Image tempImage = Image.FromFile(imagePath))
                 {
-                    conn.Open();
-
-                    string sql = "SELECT film_id, title FROM filmek ORDER BY title";
-                    MySqlCommand cmd = new MySqlCommand(sql, conn);
-
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            listBoxFilmek.Items.Add(reader["film_id"].ToString() + ";" + reader["title"].ToString());
-                        }
-                    }
+                    pbFilmImage.Image = new Bitmap(tempImage);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show("Filmek betöltése hiba: " + ex.Message);
+                pbFilmImage.Image = null;
             }
         }
-        private void listBoxFilmek_SelectedIndexChanged(object sender, EventArgs e)
+
+        private int? GetSelectedAgeLimit()
         {
-            if (listBoxFilmek.SelectedItem == null)
-                return;
+            if (cmbAgeLimit.SelectedItem == null)
+                return null;
 
-            string[] parts = listBoxFilmek.SelectedItem.ToString().Split(';');
-            int filmId = int.Parse(parts[0]);
+            string text = cmbAgeLimit.SelectedItem.ToString();
 
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(cs))
-                {
-                    conn.Open();
+            if (string.IsNullOrWhiteSpace(text))
+                return null;
 
-                    string sql = @"SELECT film_id, title, description, duration_minutes, release_year, genre, is_active
-                           FROM filmek
-                           WHERE film_id = @id";
+            text = text.Replace("+", "");
 
-                    MySqlCommand cmd = new MySqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@id", filmId);
+            if (int.TryParse(text, out int value))
+                return value;
 
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            selectedFilmId = Convert.ToInt32(reader["film_id"]);
-                            txtTitle.Text = reader["title"].ToString();
-                            txtDescription.Text = reader["description"].ToString();
-                            txtDuration.Text = reader["duration_minutes"].ToString();
-                            txtReleaseYear.Text = reader["release_year"].ToString();
-                            cmbGenre.Text = reader["genre"].ToString();
-
-                            int active = Convert.ToInt32(reader["is_active"]);
-                            chkActive.Checked = (active == 1);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Film betöltése hiba: " + ex.Message);
-            }
+            return null;
         }
-        private bool HasColumn(MySqlDataReader reader, string columnName)
-        {
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                if (reader.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
-                    return true;
-            }
-            return false;
-        }
+
         private void btnNew_Click(object sender, EventArgs e)
         {
-            ClearForm();
+            _selectedFilm = null;
+            lstFilmek.ClearSelected();
+            ClearFilmDetails();
         }
+
         private void btnSave_Click(object sender, EventArgs e)
         {
+            if (_selectedFilm == null)
+            {
+                MessageBox.Show("Előbb válassz ki egy filmet a listából.");
+                return;
+            }
+
             try
             {
-                int duration;
-                int releaseYear;
+                _selectedFilm.Title = txtTitle.Text.Trim();
+                _selectedFilm.Genre = cmbGenre.SelectedItem?.ToString() ?? "";
+                _selectedFilm.DurationMinutes = (int)numDuration.Value;
+                _selectedFilm.ReleaseYear = (int)numReleaseYear.Value;
+                _selectedFilm.AgeLimit = GetSelectedAgeLimit();
+                _selectedFilm.Director = txtDirector.Text.Trim();
+                _selectedFilm.Producer = txtProducer.Text.Trim();
+                _selectedFilm.IsActive = chkIsActive.Checked;
+                _selectedFilm.Actors = rtbActors.Text.Trim();
+                _selectedFilm.Description = rtbDescription.Text.Trim();
 
-                if (string.IsNullOrWhiteSpace(txtTitle.Text))
+                bool success = _filmService.UpdateFilm(_selectedFilm);
+
+                if (success)
                 {
-                    MessageBox.Show("A film címe kötelező!");
-                    return;
+                    MessageBox.Show("Mentés sikeres.");
+                    LoadFilmek();
                 }
-
-                if (!int.TryParse(txtDuration.Text, out duration))
+                else
                 {
-                    MessageBox.Show("A játékidő szám legyen!");
-                    return;
+                    MessageBox.Show("A mentés nem sikerült.");
                 }
-
-                if (!int.TryParse(txtReleaseYear.Text, out releaseYear))
-                {
-                    MessageBox.Show("A megjelenési év szám legyen!");
-                    return;
-                }
-
-                int isActive = chkActive.Checked ? 1 : 0;
-
-                using (MySqlConnection conn = new MySqlConnection(cs))
-                {
-                    conn.Open();
-
-                    MySqlCommand cmd;
-
-                    if (selectedFilmId == null)
-                    {
-                        string insertSql = @"
-                    INSERT INTO filmek(title, description, duration_minutes, release_year, genre, is_active)
-                    VALUES(@title, @description, @duration, @release, @genre, @active)";
-
-                        cmd = new MySqlCommand(insertSql, conn);
-                    }
-                    else
-                    {
-                        string updateSql = @"
-                    UPDATE filmek
-                    SET title = @title,
-                        description = @description,
-                        duration_minutes = @duration,
-                        release_year = @release,
-                        genre = @genre,
-                        is_active = @active
-                    WHERE film_id = @id";
-
-                        cmd = new MySqlCommand(updateSql, conn);
-                        cmd.Parameters.AddWithValue("@id", selectedFilmId.Value);
-                    }
-
-                    cmd.Parameters.AddWithValue("@title", txtTitle.Text.Trim());
-                    cmd.Parameters.AddWithValue("@description", txtDescription.Text.Trim());
-                    cmd.Parameters.AddWithValue("@duration", duration);
-                    cmd.Parameters.AddWithValue("@release", releaseYear);
-                    cmd.Parameters.AddWithValue("@genre", cmbGenre.Text);
-                    cmd.Parameters.AddWithValue("@active", isActive);
-
-                    cmd.ExecuteNonQuery();
-                }
-
-                MessageBox.Show("Mentés sikeres!");
-                ClearForm();
-                btnLoadFilms_Click(null, null);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Mentési hiba: " + ex.Message);
+                MessageBox.Show("Hiba mentés közben:\n" + ex.Message);
             }
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (selectedFilmId == null)
+            if (_selectedFilm == null)
             {
-                MessageBox.Show("Nincs kiválasztott film!");
+                MessageBox.Show("Előbb válassz ki egy filmet a listából.");
                 return;
             }
 
-            var ok = MessageBox.Show("Biztosan törlöd ezt a filmet?", "Törlés", MessageBoxButtons.YesNo);
-            if (ok != DialogResult.Yes) return;
+            DialogResult result = MessageBox.Show(
+                "Biztosan törlöd a kiválasztott filmet?",
+                "Megerősítés",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result != DialogResult.Yes)
+                return;
 
             try
             {
-                using (MySqlConnection conn = new MySqlConnection(cs))
+                bool success = _filmService.DeleteFilm(_selectedFilm.FilmId);
+
+                if (success)
                 {
-                    conn.Open();
-
-                    string sql = "DELETE FROM filmek WHERE film_id = @id";
-                    MySqlCommand cmd = new MySqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@id", selectedFilmId.Value);
-
-                    int rows = cmd.ExecuteNonQuery();
-                    MessageBox.Show("Törölt sorok: " + rows);
+                    MessageBox.Show("Törlés sikeres.");
+                    _selectedFilm = null;
+                    LoadFilmek();
                 }
-
-                ClearForm();
-                LoadFilms();
+                else
+                {
+                    MessageBox.Show("A törlés nem sikerült.");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Törlés hiba: " + ex.Message);
+                MessageBox.Show("Hiba törlés közben:\n" + ex.Message);
             }
         }
-        private void btnBack_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
 
-        private void listBoxFilmek_SelectedIndexChanged_1(object sender, EventArgs e)
+        private void btnClose_Click(object sender, EventArgs e)
         {
-
+            Close();
         }
     }
 }

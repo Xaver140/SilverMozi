@@ -1,224 +1,292 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
+using asztali.Models;
+using asztali.Services;
 
 namespace asztali
 {
     public partial class DatabaseForm : Form
     {
-        string cs = "server=localhost;uid=root;database=mozi_adat;port=3306;pwd=;";
+        private readonly UserService _userService;
+        private BindingList<UserItem> _bindingUsers;
+        private List<UserItem> _users;
+        private UserItem _selectedUser;
+
         public DatabaseForm()
         {
             InitializeComponent();
+
+            _userService = new UserService();
+            _bindingUsers = new BindingList<UserItem>();
+            _users = new List<UserItem>();
+
+            PrepareGrid();
+            WireUpEvents();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void DatabaseForm_Load(object sender, EventArgs e)
         {
-            using (MySqlConnection conn = new MySqlConnection(cs))
-            {
-                conn.Open();
-
-                string sql = "SELECT * FROM users";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-
-                using (MySqlDataReader reader = cmd.ExecuteReader())
-                {
-                    listBox1.Items.Clear();
-
-                    while (reader.Read())
-                    {
-                        listBox1.Items.Add(reader["full_name"].ToString() + ";" + reader["phone_number"].ToString() + ";" + reader["email"].ToString());
-                    }
-                }
-            }
+            LoadUsers();
         }
 
-        private void LoadList()
+        private void WireUpEvents()
+        {
+            this.Load += DatabaseForm_Load;
+
+            dgvUsers.SelectionChanged += dgvUsers_SelectionChanged;
+
+            btnLoad.Click += btnLoad_Click;
+            btnNew.Click += btnNew_Click;
+            btnSave.Click += btnSave_Click;
+            btnDelete.Click += btnDelete_Click;
+            btnBack.Click += btnBack_Click;
+        }
+
+        private void PrepareGrid()
+        {
+            dgvUsers.AutoGenerateColumns = true;
+            dgvUsers.ReadOnly = true;
+            dgvUsers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvUsers.MultiSelect = false;
+            dgvUsers.AllowUserToAddRows = false;
+            dgvUsers.AllowUserToDeleteRows = false;
+            dgvUsers.AllowUserToResizeRows = false;
+            dgvUsers.RowHeadersVisible = false;
+            dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvUsers.BackgroundColor = Color.White;
+            dgvUsers.BorderStyle = BorderStyle.None;
+            dgvUsers.GridColor = Color.LightGray;
+            dgvUsers.EnableHeadersVisualStyles = false;
+
+            dgvUsers.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(45, 45, 48);
+            dgvUsers.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dgvUsers.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+
+            dgvUsers.DefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Regular);
+            dgvUsers.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 120, 215);
+            dgvUsers.DefaultCellStyle.SelectionForeColor = Color.White;
+
+            dgvUsers.ColumnHeadersHeight = 36;
+            dgvUsers.RowTemplate.Height = 32;
+        }
+
+        private void LoadUsers()
         {
             try
             {
-                listBox1.Items.Clear();
+                _users = _userService.GetAllUsers();
+                _bindingUsers = new BindingList<UserItem>(_users);
 
-                using (MySqlConnection conn = new MySqlConnection(cs))
+                dgvUsers.DataSource = null;
+                dgvUsers.DataSource = _bindingUsers;
+
+                if (dgvUsers.Columns["UserId"] != null)
                 {
-                    conn.Open();
+                    dgvUsers.Columns["UserId"].HeaderText = "ID";
+                    dgvUsers.Columns["UserId"].FillWeight = 20;
+                }
 
-                    string sql = "SELECT * FROM users";
-                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+                if (dgvUsers.Columns["FullName"] != null)
+                {
+                    dgvUsers.Columns["FullName"].HeaderText = "Név";
+                    dgvUsers.Columns["FullName"].FillWeight = 40;
+                }
 
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                if (dgvUsers.Columns["Email"] != null)
+                {
+                    dgvUsers.Columns["Email"].HeaderText = "Email";
+                    dgvUsers.Columns["Email"].FillWeight = 40;
+                }
+
+                if (dgvUsers.Columns["PhoneNumber"] != null)
+                {
+                    dgvUsers.Columns["PhoneNumber"].HeaderText = "Telefonszám";
+                    dgvUsers.Columns["PhoneNumber"].FillWeight = 30;
+                }
+
+                if (dgvUsers.Rows.Count > 0)
+                {
+                    dgvUsers.Rows[0].Selected = true;
+                    LoadSelectedUserFromGrid();
+                }
+                else
+                {
+                    ClearEditor();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hiba a felhasználók betöltésekor:\n" + ex.Message,
+                    "Hiba",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private void dgvUsers_SelectionChanged(object sender, EventArgs e)
+        {
+            LoadSelectedUserFromGrid();
+        }
+
+        private void LoadSelectedUserFromGrid()
+        {
+            if (dgvUsers.CurrentRow == null || dgvUsers.CurrentRow.DataBoundItem == null)
+            {
+                _selectedUser = null;
+                return;
+            }
+
+            _selectedUser = dgvUsers.CurrentRow.DataBoundItem as UserItem;
+            if (_selectedUser == null)
+                return;
+
+            txtFullName.Text = _selectedUser.FullName;
+            txtEmail.Text = _selectedUser.Email;
+            txtPhone.Text = _selectedUser.PhoneNumber;
+        }
+
+        private void ClearEditor()
+        {
+            _selectedUser = null;
+            txtFullName.Text = "";
+            txtEmail.Text = "";
+            txtPhone.Text = "";
+        }
+
+        private bool ValidateInputs()
+        {
+            if (string.IsNullOrWhiteSpace(txtFullName.Text))
+            {
+                MessageBox.Show("A név megadása kötelező.");
+                txtFullName.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                MessageBox.Show("Az email megadása kötelező.");
+                txtEmail.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            LoadUsers();
+        }
+
+        private void btnNew_Click(object sender, EventArgs e)
+        {
+            dgvUsers.ClearSelection();
+            ClearEditor();
+            txtFullName.Focus();
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (!ValidateInputs())
+                return;
+
+            try
+            {
+                if (_selectedUser == null)
+                {
+                    UserItem newUser = new UserItem
                     {
-                        listBox1.Items.Clear();
+                        FullName = txtFullName.Text.Trim(),
+                        Email = txtEmail.Text.Trim(),
+                        PhoneNumber = txtPhone.Text.Trim()
+                    };
 
-                        while (reader.Read())
-                        {
-                            listBox1.Items.Add(reader["full_name"].ToString() + ";" + reader["phone_number"].ToString() + ";" + reader["email"].ToString());
-                        }
+                    bool added = _userService.AddUser(newUser);
+
+                    if (added)
+                    {
+                        MessageBox.Show("Új felhasználó sikeresen mentve.");
+                        LoadUsers();
+                    }
+                    else
+                    {
+                        MessageBox.Show("A mentés nem sikerült.");
+                    }
+                }
+                else
+                {
+                    _selectedUser.FullName = txtFullName.Text.Trim();
+                    _selectedUser.Email = txtEmail.Text.Trim();
+                    _selectedUser.PhoneNumber = txtPhone.Text.Trim();
+
+                    bool updated = _userService.UpdateUser(_selectedUser);
+
+                    if (updated)
+                    {
+                        MessageBox.Show("Felhasználó sikeresen frissítve.");
+                        LoadUsers();
+                    }
+                    else
+                    {
+                        MessageBox.Show("A frissítés nem sikerült.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), "LoadList hiba");
+                MessageBox.Show("Hiba mentés közben:\n" + ex.Message,
+                    "Hiba",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
-
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void btnDelete_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void Update_Click(object sender, EventArgs e)
-        {
-            if (listBox1.SelectedItem == null)
+            if (_selectedUser == null)
             {
-                MessageBox.Show("Válassz ki egy elemet!");
+                MessageBox.Show("Előbb válassz ki egy felhasználót.");
                 return;
             }
 
-            string[] parts = listBox1.SelectedItem.ToString().Split(';');
-            string oldName = parts[0].Trim();
-            string oldPhone = parts.Length > 1 ? parts[1].Trim() : "";
-            string oldEmail = parts.Length > 2 ? parts[2].Trim() : "";
+            DialogResult result = MessageBox.Show(
+                "Biztosan törlöd a kiválasztott felhasználót?",
+                "Megerősítés",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
 
-            // Új értékek (alapból marad a régi)
-            string newName = oldName;
-            string newPhone = oldPhone;
-            string newEmail = oldEmail;
-
-            // 1) Név
-            var ansName = MessageBox.Show("A nevét kívánja módosítani?", "Update", MessageBoxButtons.YesNo);
-            if (ansName == DialogResult.Yes)
-            {
-                string input = Microsoft.VisualBasic.Interaction.InputBox("Új név:", "Név módosítása", oldName);
-                if (!string.IsNullOrWhiteSpace(input)) newName = input.Trim();
-            }
-
-            // 2) Telefon
-            var ansPhone = MessageBox.Show("A telefonszámát kívánja módosítani?", "Update", MessageBoxButtons.YesNo);
-            if (ansPhone == DialogResult.Yes)
-            {
-                string input = Microsoft.VisualBasic.Interaction.InputBox("Új telefonszám:", "Telefon módosítása", oldPhone);
-                if (!string.IsNullOrWhiteSpace(input)) newPhone = input.Trim();
-            }
-
-            // 3) Email
-            var ansEmail = MessageBox.Show("Az email címét kívánja módosítani?", "Update", MessageBoxButtons.YesNo);
-            if (ansEmail == DialogResult.Yes)
-            {
-                string input = Microsoft.VisualBasic.Interaction.InputBox("Új email:", "Email módosítása", oldEmail);
-                if (!string.IsNullOrWhiteSpace(input)) newEmail = input.Trim();
-            }
-
-            // Ha semmit nem változtatott
-            if (newName == oldName && newPhone == oldPhone && newEmail == oldEmail)
-            {
-                MessageBox.Show("Nem történt módosítás.");
+            if (result != DialogResult.Yes)
                 return;
-            }
 
             try
             {
-                using (var conn = new MySqlConnection(cs))
+                bool deleted = _userService.DeleteUser(_selectedUser.UserId);
+
+                if (deleted)
                 {
-                    conn.Open();
-
-                    // Frissítés: beállítjuk az új értékeket
-                    // Azonosítás: az eredeti adatok alapján (amíg nincs ID)
-                    using (var cmd = new MySqlCommand(
-                        @"UPDATE users
-                  SET full_name=@newName, phone_number=@newPhone, email=@newEmail
-                  WHERE full_name=@oldName AND phone_number=@oldPhone AND email=@oldEmail",
-                        conn))
-                    {
-                        cmd.Parameters.AddWithValue("@newName", newName);
-                        cmd.Parameters.AddWithValue("@newPhone", newPhone);
-                        cmd.Parameters.AddWithValue("@newEmail", newEmail);
-
-                        cmd.Parameters.AddWithValue("@oldName", oldName);
-                        cmd.Parameters.AddWithValue("@oldPhone", oldPhone);
-                        cmd.Parameters.AddWithValue("@oldEmail", oldEmail);
-
-                        int rows = cmd.ExecuteNonQuery();
-                        MessageBox.Show($"Módosított sorok: {rows}");
-                    }
+                    MessageBox.Show("Felhasználó sikeresen törölve.");
+                    LoadUsers();
                 }
-
-
-                LoadList(); // ezután jön a gond nálad -> ott lesz a hiba
+                else
+                {
+                    MessageBox.Show("A törlés nem sikerült.");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), "Update hiba");
-
+                MessageBox.Show("Hiba törlés közben:\n" + ex.Message,
+                    "Hiba",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
-        private void Insert_Click(object sender, EventArgs e)
+        private void btnBack_Click(object sender, EventArgs e)
         {
-            string name = Microsoft.VisualBasic.Interaction.InputBox("Név:");
-            string phone = Microsoft.VisualBasic.Interaction.InputBox("Telefon:");
-            string email = Microsoft.VisualBasic.Interaction.InputBox("Email:");
-
-            using (var conn = new MySqlConnection(cs))
-            {
-                conn.Open();
-
-                var cmd = new MySqlCommand(
-                    "INSERT INTO users(full_name, phone_number, email) VALUES(@n,@p,@e)", conn);
-
-                cmd.Parameters.AddWithValue("@n", name);
-                cmd.Parameters.AddWithValue("@p", phone);
-                cmd.Parameters.AddWithValue("@e", email);
-
-
-                cmd.ExecuteNonQuery();
-            }
-
-            LoadList();
-        }
-
-        private void Delete_Click(object sender, EventArgs e)
-        {
-            if (listBox1.SelectedItem == null)
-            {
-                MessageBox.Show("Nincs kiválasztva elem!");
-                return;
-            }
-
-            var selected = listBox1.SelectedItem.ToString().Split(';')[0].Trim();
-
-            var ok = MessageBox.Show("Biztos törlöd?", "Delete", MessageBoxButtons.YesNo);
-            if (ok != DialogResult.Yes) return;
-
-            using (var conn = new MySqlConnection(cs))
-            {
-                conn.Open();
-
-                using (var cmd = new MySqlCommand("DELETE FROM users WHERE full_name = @t", conn))
-                {
-                    cmd.Parameters.AddWithValue("@t", selected);
-
-                    int rows = cmd.ExecuteNonQuery();
-                    MessageBox.Show($"Törölt sorok száma: {rows}");
-                }
-            }
-
-            LoadList();
-        }
-
-        private void BacktoMain_Click(object sender, EventArgs e)
-        {
-            this.Close();
+            Close();
         }
     }
 }

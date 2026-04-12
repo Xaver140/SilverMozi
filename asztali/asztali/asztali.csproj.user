@@ -7,6 +7,9 @@
     <Compile Update="FilmEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="FormTerem.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

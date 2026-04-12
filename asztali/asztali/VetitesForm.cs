@@ -1,438 +1,431 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 using System.Globalization;
-
+using System.Linq;
+using System.Windows.Forms;
+using asztali.Models;
+using asztali.Services;
 
 namespace asztali
 {
     public partial class VetitesForm : Form
     {
-        private string cs = "server=localhost;uid=root;database=mozi_adat;port=3306;pwd=;";
-        private int? selectedVetitesId = null;
+        private readonly VetitesService _vetitesService;
+        private readonly FilmService _filmService;
+        private readonly TeremService _teremService;
+
+        private List<Vetites> _vetitesek;
+        private List<Film> _filmek;
+        private List<Terem> _termek;
+
+        private bool _isLoadingFormData;
 
         public VetitesForm()
         {
             InitializeComponent();
 
+            _vetitesService = new VetitesService();
+            _filmService = new FilmService();
+            _teremService = new TeremService();
+
+            _vetitesek = new List<Vetites>();
+            _filmek = new List<Film>();
+            _termek = new List<Terem>();
+
+            dtStart.Format = DateTimePickerFormat.Custom;
+            dtStart.CustomFormat = "yyyy.MM.dd HH:mm";
+
+            dtEnd.Format = DateTimePickerFormat.Custom;
+            dtEnd.CustomFormat = "yyyy.MM.dd HH:mm";
+            dtEnd.Enabled = false;
+
+            WireUpEvents();
+            ImproveExistingLayout();
+        }
+
+        private void VetitesForm_Load(object sender, EventArgs e)
+        {
+            LoadAllData();
+        }
+
+        private void WireUpEvents()
+        {
+            Load += VetitesForm_Load;
+
             listBoxVetitesek.SelectedIndexChanged += listBoxVetitesek_SelectedIndexChanged;
+
             btnLoad.Click += btnLoad_Click;
             btnNew.Click += btnNew_Click;
             btnSave.Click += btnSave_Click;
             btnDelete.Click += btnDelete_Click;
             btnBack.Click += btnBack_Click;
 
+            cmbFilm.SelectedIndexChanged += cmbFilm_SelectedIndexChanged;
+            dtStart.ValueChanged += dtStart_ValueChanged;
+        }
+
+        private void ImproveExistingLayout()
+        {
+            Text = "Vetítések";
+            StartPosition = FormStartPosition.CenterScreen;
+
+            groupBox1.Text = "Vetítések kezelése";
+            groupBox1.Padding = new Padding(10);
+
+            listBoxVetitesek.Font = new System.Drawing.Font("Segoe UI", 10F);
+            listBoxVetitesek.IntegralHeight = false;
+
+            label1.Text = "Film:";
+            label2.Text = "Terem:";
+            label3.Text = "Kezdés:";
+            label4.Text = "Befejezés:";
+            label5.Text = "Alapár:";
+
+            cmbFilm.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbTerem.DropDownStyle = ComboBoxStyle.DropDownList;
+
             dtStart.Format = DateTimePickerFormat.Custom;
-            dtStart.CustomFormat = "yyyy-MM-dd HH:mm";
-            dtStart.ShowUpDown = true;
+            dtStart.CustomFormat = "yyyy.MM.dd HH:mm";
 
             dtEnd.Format = DateTimePickerFormat.Custom;
-            dtEnd.CustomFormat = "yyyy-MM-dd HH:mm";
-            dtEnd.ShowUpDown = true;
+            dtEnd.CustomFormat = "yyyy.MM.dd HH:mm";
         }
 
-        private void VetitesForm_Load(object sender, EventArgs e)
+        private void LoadAllData()
         {
-            LoadFilms();
-            LoadTermek();
-            ClearForm();
-        }
-
-        private void LoadFilms()
-        {
-            cmbFilm.Items.Clear();
-
             try
             {
-                using (MySqlConnection conn = new MySqlConnection(cs))
-                {
-                    conn.Open();
+                _isLoadingFormData = true;
 
-                    string sql = "SELECT film_id, title FROM filmek WHERE is_active = 1 ORDER BY title";
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            cmbFilm.Items.Add(new ComboItem(
-                                Convert.ToInt32(reader["film_id"]),
-                                reader["title"].ToString()
-                            ));
-                        }
-                    }
+                _filmek = _filmService.GetAllFilmek();
+                _termek = _teremService.GetAllTermek();
+                _vetitesek = _vetitesService.GetAllVetitesek();
+                
+                FillFilmCombo();
+                FillTeremCombo();
+                FillVetitesList();
+
+                if (listBoxVetitesek.Items.Count > 0)
+                {
+                    listBoxVetitesek.SelectedIndex = 0;
+                }
+                else
+                {
+                    PrepareNewRecord();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Filmek betöltése hiba: " + ex.Message);
+                MessageBox.Show("Hiba a vetítések betöltésekor:\n" + ex.Message, "Hiba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                _isLoadingFormData = false;
             }
         }
 
-        private void LoadTermek()
+        private void FillFilmCombo()
         {
-            cmbTerem.Items.Clear();
+            cmbFilm.DataSource = null;
 
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(cs))
+            var items = _filmek
+                .OrderBy(f => f.Title)
+                .Select(f => new ComboItem
                 {
-                    conn.Open();
+                    Id = f.FilmId,
+                    Name = f.Title
+                })
+                .ToList();
 
-                    string sql = "SELECT terem_id FROM terem ORDER BY terem_id";
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            cmbTerem.Items.Add(new ComboItem(
-                                Convert.ToInt32(reader["terem_id"]),
-                                "Terem " + reader["terem_id"].ToString()
-                            ));
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Termek betöltése hiba: " + ex.Message);
-            }
+            cmbFilm.DataSource = items;
+            cmbFilm.DisplayMember = "Name";
+            cmbFilm.ValueMember = "Id";
         }
 
-        private void LoadVetitesek()
+        private void FillTeremCombo()
+        {
+            cmbTerem.DataSource = null;
+
+            var items = _termek
+                .OrderBy(t => t.Name)
+                .Select(t => new ComboItem
+                {
+                    Id = t.TeremId,
+                    Name = t.Name
+                })
+                .ToList();
+
+            cmbTerem.DataSource = items;
+            cmbTerem.DisplayMember = "Name";
+            cmbTerem.ValueMember = "Id";
+        }
+
+        private void FillVetitesList()
         {
             listBoxVetitesek.Items.Clear();
 
-            try
+            foreach (var vetites in _vetitesek.OrderBy(v => v.StartTime))
             {
-                using (MySqlConnection conn = new MySqlConnection(cs))
+                Film film = _filmek.FirstOrDefault(f => f.FilmId == vetites.FilmId);
+                Terem terem = _termek.FirstOrDefault(t => t.TeremId == vetites.TeremId);
+
+                string filmTitle = film != null ? film.Title : $"Film #{vetites.FilmId}";
+                string teremName = terem != null ? terem.Name : $"Terem #{vetites.TeremId}";
+
+                listBoxVetitesek.Items.Add(new VetitesListItemDisplay
                 {
-                    conn.Open();
-
-                    string sql = @"
-                        SELECT v.vetites_id, v.film_id, f.title, v.terem_id, v.start_time, v.end_time, v.base_price
-                        FROM vetites v
-                        INNER JOIN filmek f ON v.film_id = f.film_id
-                        ORDER BY v.start_time";
-
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int vetitesId = Convert.ToInt32(reader["vetites_id"]);
-                            string title = reader["title"].ToString();
-                            int teremId = Convert.ToInt32(reader["terem_id"]);
-                            DateTime start = Convert.ToDateTime(reader["start_time"]);
-
-                            listBoxVetitesek.Items.Add(
-                                new VetitesListItem(
-                                    vetitesId,
-                                    $"{title} | Terem {teremId} | {start:yyyy-MM-dd HH:mm}"
-                                )
-                            );
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Vetítések betöltése hiba: " + ex.Message);
+                    VetitesId = vetites.VetitesId,
+                    DisplayText = $"{vetites.StartTime:MM.dd HH:mm} | {filmTitle} | {teremName}"
+                });
             }
         }
 
         private void listBoxVetitesek_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listBoxVetitesek.SelectedItem == null)
+            if (_isLoadingFormData)
                 return;
 
-            VetitesListItem item = listBoxVetitesek.SelectedItem as VetitesListItem;
-            if (item == null)
+            if (listBoxVetitesek.SelectedItem is not VetitesListItemDisplay selected)
                 return;
+
+            Vetites vetites = _vetitesek.FirstOrDefault(v => v.VetitesId == selected.VetitesId);
+            if (vetites == null)
+                return;
+
+            LoadVetitesIntoForm(vetites);
+        }
+
+        private void LoadVetitesIntoForm(Vetites vetites)
+        {
+            _isLoadingFormData = true;
 
             try
             {
-                using (MySqlConnection conn = new MySqlConnection(cs))
-                {
-                    conn.Open();
-
-                    string sql = @"
-                        SELECT vetites_id, film_id, terem_id, start_time, end_time, base_price
-                        FROM vetites
-                        WHERE vetites_id = @id";
-
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@id", item.Id);
-
-                        using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                selectedVetitesId = Convert.ToInt32(reader["vetites_id"]);
-                                int filmId = Convert.ToInt32(reader["film_id"]);
-                                int teremId = Convert.ToInt32(reader["terem_id"]);
-
-                                SelectComboItemByValue(cmbFilm, filmId);
-                                SelectComboItemByValue(cmbTerem, teremId);
-
-                                dtStart.Value = Convert.ToDateTime(reader["start_time"]);
-                                dtEnd.Value = Convert.ToDateTime(reader["end_time"]);
-                                txtPrice.Text = Convert.ToDecimal(reader["base_price"]).ToString("0.##");
-                            }
-                        }
-                    }
-                }
+                cmbFilm.SelectedValue = vetites.FilmId;
+                cmbTerem.SelectedValue = vetites.TeremId;
+                dtStart.Value = vetites.StartTime;
+                dtEnd.Value = vetites.EndTime ?? vetites.StartTime;
+                txtPrice.Text = vetites.BasePrice.ToString("0.##", CultureInfo.CurrentCulture);
             }
-            catch (Exception ex)
+            finally
             {
-                MessageBox.Show("Vetítés betöltése hiba: " + ex.Message);
+                _isLoadingFormData = false;
+            }
+        }
+
+        private void PrepareNewRecord()
+        {
+            _isLoadingFormData = true;
+
+            try
+            {
+                listBoxVetitesek.ClearSelected();
+
+                if (cmbFilm.Items.Count > 0)
+                    cmbFilm.SelectedIndex = 0;
+
+                if (cmbTerem.Items.Count > 0)
+                    cmbTerem.SelectedIndex = 0;
+
+                dtStart.Value = DateTime.Now.AddMinutes(30);
+
+
+                txtPrice.Text = "2500";
+
+                CalculateEndTime();
+            }
+            finally
+            {
+                _isLoadingFormData = false;
             }
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            LoadVetitesek();
+            LoadAllData();
         }
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-            ClearForm();
+            PrepareNewRecord();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
             try
             {
-                if (cmbFilm.SelectedItem == null)
+                if (cmbFilm.SelectedValue == null)
                 {
-                    MessageBox.Show("Válassz filmet!");
+                    MessageBox.Show("Válassz filmet.");
                     return;
                 }
 
-                if (cmbTerem.SelectedItem == null)
+                if (cmbTerem.SelectedValue == null)
                 {
-                    MessageBox.Show("Válassz termet!");
+                    MessageBox.Show("Válassz termet.");
                     return;
                 }
 
-                if (!decimal.TryParse(txtPrice.Text.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price) &&
-                    !decimal.TryParse(txtPrice.Text.Trim(), out price))
+                if (!TryParsePrice(txtPrice.Text, out decimal price))
                 {
-                    MessageBox.Show("Az ár szám legyen!");
+                    MessageBox.Show("Az alapár nem megfelelő.");
                     return;
                 }
 
-                DateTime start = dtStart.Value;
-                DateTime end = dtEnd.Value;
-
-                if (start >= end)
+                Vetites vetites = new Vetites
                 {
-                    MessageBox.Show("A kezdési idő nem lehet későbbi vagy egyenlő a befejezéssel.");
-                    return;
+                    FilmId = Convert.ToInt32(cmbFilm.SelectedValue),
+                    TeremId = Convert.ToInt32(cmbTerem.SelectedValue),
+                    StartTime = dtStart.Value,
+                    EndTime = dtEnd.Value,
+                    BasePrice = price
+                };
+
+                bool success;
+
+                if (listBoxVetitesek.SelectedItem is VetitesListItemDisplay selected)
+                {
+                    vetites.VetitesId = selected.VetitesId;
+                    success = _vetitesService.UpdateVetites(vetites);
+                }
+                else
+                {
+                    success = _vetitesService.AddVetites(vetites);
                 }
 
-                ComboItem filmItem = cmbFilm.SelectedItem as ComboItem;
-                ComboItem teremItem = cmbTerem.SelectedItem as ComboItem;
-
-                int filmId = filmItem.Value;
-                int teremId = teremItem.Value;
-
-                if (HasRoomConflict(teremId, start, end, selectedVetitesId))
+                if (success)
                 {
-                    MessageBox.Show("Ebben a teremben már van másik vetítés ebben az időszakban.");
-                    return;
+                    MessageBox.Show("Mentés sikeres.");
+                    LoadAllData();
                 }
-
-                using (MySqlConnection conn = new MySqlConnection(cs))
+                else
                 {
-                    conn.Open();
-
-                    MySqlCommand cmd;
-
-                    if (selectedVetitesId == null)
-                    {
-                        string insertSql = @"
-                            INSERT INTO vetites(film_id, terem_id, start_time, end_time, base_price)
-                            VALUES(@film, @terem, @start, @end, @price)";
-
-                        cmd = new MySqlCommand(insertSql, conn);
-                    }
-                    else
-                    {
-                        string updateSql = @"
-                            UPDATE vetites
-                            SET film_id = @film,
-                                terem_id = @terem,
-                                start_time = @start,
-                                end_time = @end,
-                                base_price = @price
-                            WHERE vetites_id = @id";
-
-                        cmd = new MySqlCommand(updateSql, conn);
-                        cmd.Parameters.AddWithValue("@id", selectedVetitesId.Value);
-                    }
-
-                    cmd.Parameters.AddWithValue("@film", filmId);
-                    cmd.Parameters.AddWithValue("@terem", teremId);
-                    cmd.Parameters.AddWithValue("@start", start);
-                    cmd.Parameters.AddWithValue("@end", end);
-                    cmd.Parameters.AddWithValue("@price", price);
-
-                    int rows = cmd.ExecuteNonQuery();
-                    MessageBox.Show("Mentés kész! Érintett sorok: " + rows);
+                    MessageBox.Show("A mentés nem sikerült.");
                 }
-
-                ClearForm();
-                LoadVetitesek();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Mentési hiba: " + ex.Message);
+                MessageBox.Show("Hiba mentés közben:\n" + ex.Message, "Hiba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (selectedVetitesId == null)
-            {
-                MessageBox.Show("Nincs kiválasztott vetítés!");
-                return;
-            }
-
-            var ok = MessageBox.Show("Biztosan törlöd ezt a vetítést?", "Törlés", MessageBoxButtons.YesNo);
-            if (ok != DialogResult.Yes)
-                return;
-
             try
             {
-                using (MySqlConnection conn = new MySqlConnection(cs))
+                if (listBoxVetitesek.SelectedItem is not VetitesListItemDisplay selected)
                 {
-                    conn.Open();
-
-                    string sql = "DELETE FROM vetites WHERE vetites_id = @id";
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@id", selectedVetitesId.Value);
-                        int rows = cmd.ExecuteNonQuery();
-                        MessageBox.Show("Törölt sorok: " + rows);
-                    }
+                    MessageBox.Show("Nincs kiválasztott vetítés.");
+                    return;
                 }
 
-                ClearForm();
-                LoadVetitesek();
+                DialogResult result = MessageBox.Show(
+                    "Biztosan törlöd a kiválasztott vetítést?",
+                    "Megerősítés",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result != DialogResult.Yes)
+                    return;
+
+                bool success = _vetitesService.DeleteVetites(selected.VetitesId);
+
+                if (success)
+                {
+                    MessageBox.Show("Törlés sikeres.");
+                    LoadAllData();
+                }
+                else
+                {
+                    MessageBox.Show("A törlés nem sikerült.");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Törlés hiba: " + ex.Message);
+                MessageBox.Show("Hiba törlés közben:\n" + ex.Message, "Hiba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnBack_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
-        private void ClearForm()
+        private void cmbFilm_SelectedIndexChanged(object sender, EventArgs e)
         {
-            selectedVetitesId = null;
+            if (_isLoadingFormData)
+                return;
 
-            listBoxVetitesek.ClearSelected();
-            cmbFilm.SelectedIndex = -1;
-            cmbTerem.SelectedIndex = -1;
-            txtPrice.Text = "";
-
-            dtStart.Value = DateTime.Now;
-            dtEnd.Value = DateTime.Now.AddHours(2);
+            CalculateEndTime();
         }
 
-        private bool HasRoomConflict(int teremId, DateTime start, DateTime end, int? currentVetitesId)
+        private void dtStart_ValueChanged(object sender, EventArgs e)
         {
-            using (MySqlConnection conn = new MySqlConnection(cs))
+            if (_isLoadingFormData)
+                return;
+
+            CalculateEndTime();
+        }
+
+
+
+        private void CalculateEndTime()
+        {
+            if (cmbFilm.SelectedValue == null)
+                return;
+
+            int filmId = Convert.ToInt32(cmbFilm.SelectedValue);
+
+            Film selectedFilm = _filmek.FirstOrDefault(f => f.FilmId == filmId);
+            if (selectedFilm == null)
+                return;
+
+            dtEnd.Value = dtStart.Value.AddMinutes(selectedFilm.DurationMinutes);
+        }
+
+        private Film GetSelectedFilm()
+        {
+            if (cmbFilm.SelectedValue == null)
+                return null;
+
+            int filmId = Convert.ToInt32(cmbFilm.SelectedValue);
+            return _filmek.FirstOrDefault(f => f.FilmId == filmId);
+        }
+
+        private bool TryParsePrice(string text, out decimal price)
+        {
+            if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.CurrentCulture, out price))
+                return true;
+
+            if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out price))
+                return true;
+
+            text = text.Replace("Ft", "", StringComparison.OrdinalIgnoreCase).Trim();
+
+            return decimal.TryParse(text, NumberStyles.Number, CultureInfo.CurrentCulture, out price)
+                   || decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out price);
+        }
+
+        private class ComboItem
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        private class VetitesListItemDisplay
+        {
+            public int VetitesId { get; set; }
+            public string DisplayText { get; set; }
+
+            public override string ToString()
             {
-                conn.Open();
-
-                string sql = @"
-                    SELECT COUNT(*)
-                    FROM vetites
-                    WHERE terem_id = @terem
-                      AND (@currentId IS NULL OR vetites_id <> @currentId)
-                      AND (
-                            (@start < end_time AND @end > start_time)
-                          )";
-
-                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@terem", teremId);
-                    cmd.Parameters.AddWithValue("@currentId", currentVetitesId.HasValue ? (object)currentVetitesId.Value : DBNull.Value);
-                    cmd.Parameters.AddWithValue("@start", start);
-                    cmd.Parameters.AddWithValue("@end", end);
-
-                    int count = Convert.ToInt32(cmd.ExecuteScalar());
-                    return count > 0;
-                }
+                return DisplayText;
             }
         }
 
-        private void SelectComboItemByValue(ComboBox comboBox, int value)
-        {
-            for (int i = 0; i < comboBox.Items.Count; i++)
-            {
-                ComboItem item = comboBox.Items[i] as ComboItem;
-                if (item != null && item.Value == value)
-                {
-                    comboBox.SelectedIndex = i;
-                    return;
-                }
-            }
-        }
-
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        private void groupBox1_Enter(object sender, EventArgs e)
         {
 
-        }
-
-        private void listBoxVetitesek_SelectedIndexChanged_1(object sender, EventArgs e)
-        {
-
-        }
-    }
-    public class ComboItem
-    {
-        public int Value { get; set; }
-        public string Text { get; set; }
-
-        public ComboItem(int value, string text)
-        {
-            Value = value;
-            Text = text;
-        }
-
-        public override string ToString()
-        {
-            return Text;
-        }
-    }
-    public class VetitesListItem
-    {
-        public int Id { get; set; }
-        public string Text { get; set; }
-
-        public VetitesListItem(int id, string text)
-        {
-            Id = id;
-            Text = text;
-        }
-
-        public override string ToString()
-        {
-            return Text;
         }
     }
 }

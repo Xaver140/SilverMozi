@@ -15,7 +15,9 @@ namespace asztali
     {
         private readonly ApiClient _api;
 
-        string cs = "server=localhost;uid=root;database=mozi_adat;port=3306;pwd=;";
+        private FilmEditorForm filmForm;
+        private VetitesForm vetitesForm;
+        private FormTerem teremForm;
 
         public MainForm() : this(new ApiClient("http://localhost:3000"))
         {
@@ -58,38 +60,7 @@ namespace asztali
             this.Show();
         }
 
-        private void btnLoadFilmek_Click_1(object sender, EventArgs e)
-        {
-            try
-            {
-                listBoxFilmek.Items.Clear();
-
-                using (MySqlConnection conn = new MySqlConnection(cs))
-                {
-                    conn.Open();
-
-                    string sql = "SELECT title, duration_minutes, release_year, genre FROM filmek WHERE is_active = 1";
-                    MySqlCommand cmd = new MySqlCommand(sql, conn);
-
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            string title = reader["title"].ToString();
-                            string duration = reader["duration_minutes"].ToString();
-                            string release = reader["release_year"].ToString();
-                            string genre = reader["genre"].ToString();
-
-                            listBoxFilmek.Items.Add($"{title} | {duration} perc | {release} | {genre}");
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Filmek betöltése hiba: " + ex.ToString());
-            }
-        }
+        
 
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -118,6 +89,44 @@ namespace asztali
             }
 
             this.Show();
+        }
+
+        private void termekToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            FormTerem terem = new FormTerem();
+            terem.ShowDialog();
+            this.Show();
+        }
+
+        private void vetítésekToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (vetitesForm == null || vetitesForm.IsDisposed)
+            {
+                this.Hide();
+                vetitesForm = new VetitesForm();
+                vetitesForm.ShowDialog();
+                this.Show();
+            }
+            else
+            {
+                vetitesForm.Focus();
+            }
+        }
+
+        private void filmekToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (filmForm == null || filmForm.IsDisposed)
+            {
+                this.Hide();
+                filmForm = new FilmEditorForm();
+                filmForm.ShowDialog();
+                this.Show();
+            }
+            else
+            {
+                filmForm.Focus();
+            }
         }
     }
 

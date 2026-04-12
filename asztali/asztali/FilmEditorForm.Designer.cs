@@ -28,236 +28,343 @@
         /// </summary>
         private void InitializeComponent()
         {
-            listBoxFilmek = new ListBox();
-            label1 = new Label();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FilmEditorForm));
+            pbFilmImage = new PictureBox();
+            lblTitle = new Label();
             txtTitle = new TextBox();
-            label2 = new Label();
-            txtDescription = new TextBox();
-            label3 = new Label();
-            txtDuration = new TextBox();
-            label4 = new Label();
-            txtReleaseYear = new TextBox();
-            label6 = new Label();
-            label8 = new Label();
+            lblGenre = new Label();
+            lblDuration = new Label();
+            lblReleaseYear = new Label();
+            lblAgeLimit = new Label();
+            lblDirector = new Label();
+            lblProducer = new Label();
+            txtDirector = new TextBox();
+            txtProducer = new TextBox();
+            lblIsActive = new Label();
             cmbGenre = new ComboBox();
-            chkActive = new CheckBox();
-            btnLoadFilms = new Button();
-            btnNew = new Button();
+            numDuration = new NumericUpDown();
+            numReleaseYear = new NumericUpDown();
+            cmbAgeLimit = new ComboBox();
+            lblActors = new Label();
+            chkIsActive = new CheckBox();
+            rtbActors = new RichTextBox();
+            lblDescription = new Label();
+            rtbDescription = new RichTextBox();
+            lstFilmek = new ListBox();
             btnDelete = new Button();
+            btnNew = new Button();
             btnSave = new Button();
-            btnBack = new Button();
+            btnClose = new Button();
+            ((System.ComponentModel.ISupportInitialize)pbFilmImage).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numDuration).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numReleaseYear).BeginInit();
             SuspendLayout();
             // 
-            // listBoxFilmek
+            // pbFilmImage
             // 
-            listBoxFilmek.FormattingEnabled = true;
-            listBoxFilmek.Location = new Point(12, 12);
-            listBoxFilmek.Name = "listBoxFilmek";
-            listBoxFilmek.Size = new Size(327, 424);
-            listBoxFilmek.TabIndex = 0;
-            listBoxFilmek.Click += listBoxFilmek_SelectedIndexChanged;
-            listBoxFilmek.SelectedIndexChanged += listBoxFilmek_SelectedIndexChanged_1;
+            pbFilmImage.BorderStyle = BorderStyle.FixedSingle;
+            pbFilmImage.Location = new Point(417, 20);
+            pbFilmImage.Name = "pbFilmImage";
+            pbFilmImage.Size = new Size(371, 184);
+            pbFilmImage.SizeMode = PictureBoxSizeMode.Zoom;
+            pbFilmImage.TabIndex = 1;
+            pbFilmImage.TabStop = false;
             // 
-            // label1
+            // lblTitle
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(366, 12);
-            label1.Name = "label1";
-            label1.Size = new Size(73, 20);
-            label1.TabIndex = 1;
-            label1.Text = "Film címe";
+            lblTitle.AutoSize = true;
+            lblTitle.Location = new Point(12, 215);
+            lblTitle.Name = "lblTitle";
+            lblTitle.Size = new Size(38, 20);
+            lblTitle.TabIndex = 2;
+            lblTitle.Text = "Cím:";
             // 
             // txtTitle
             // 
-            txtTitle.Location = new Point(508, 12);
+            txtTitle.Location = new Point(99, 212);
             txtTitle.Name = "txtTitle";
-            txtTitle.Size = new Size(111, 27);
-            txtTitle.TabIndex = 2;
+            txtTitle.Size = new Size(135, 27);
+            txtTitle.TabIndex = 3;
             // 
-            // label2
+            // lblGenre
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(366, 55);
-            label2.Name = "label2";
-            label2.Size = new Size(47, 20);
-            label2.TabIndex = 3;
-            label2.Text = "Leírás";
+            lblGenre.AutoSize = true;
+            lblGenre.Location = new Point(12, 262);
+            lblGenre.Name = "lblGenre";
+            lblGenre.Size = new Size(50, 20);
+            lblGenre.TabIndex = 4;
+            lblGenre.Text = "Műfaj:";
             // 
-            // txtDescription
+            // lblDuration
             // 
-            txtDescription.Location = new Point(508, 55);
-            txtDescription.Multiline = true;
-            txtDescription.Name = "txtDescription";
-            txtDescription.Size = new Size(84, 35);
-            txtDescription.TabIndex = 4;
+            lblDuration.AutoSize = true;
+            lblDuration.Location = new Point(12, 311);
+            lblDuration.Name = "lblDuration";
+            lblDuration.Size = new Size(67, 20);
+            lblDuration.TabIndex = 4;
+            lblDuration.Text = "Játékidő:";
             // 
-            // label3
+            // lblReleaseYear
             // 
-            label3.AutoSize = true;
-            label3.Location = new Point(366, 153);
-            label3.Name = "label3";
-            label3.Size = new Size(107, 20);
-            label3.TabIndex = 5;
-            label3.Text = "Játékidő (perc)";
+            lblReleaseYear.AutoSize = true;
+            lblReleaseYear.Location = new Point(12, 360);
+            lblReleaseYear.Name = "lblReleaseYear";
+            lblReleaseYear.Size = new Size(83, 20);
+            lblReleaseYear.TabIndex = 4;
+            lblReleaseYear.Text = "Kiadás éve:";
             // 
-            // txtDuration
+            // lblAgeLimit
             // 
-            txtDuration.Location = new Point(508, 150);
-            txtDuration.Name = "txtDuration";
-            txtDuration.Size = new Size(49, 27);
-            txtDuration.TabIndex = 6;
+            lblAgeLimit.AutoSize = true;
+            lblAgeLimit.Location = new Point(296, 215);
+            lblAgeLimit.Name = "lblAgeLimit";
+            lblAgeLimit.Size = new Size(69, 20);
+            lblAgeLimit.TabIndex = 2;
+            lblAgeLimit.Text = "Korhatár:";
             // 
-            // label4
+            // lblDirector
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(366, 189);
-            label4.Name = "label4";
-            label4.Size = new Size(108, 20);
-            label4.TabIndex = 7;
-            label4.Text = "Megjelenési év";
+            lblDirector.AutoSize = true;
+            lblDirector.Location = new Point(296, 262);
+            lblDirector.Name = "lblDirector";
+            lblDirector.Size = new Size(70, 20);
+            lblDirector.TabIndex = 2;
+            lblDirector.Text = "Rendező:";
             // 
-            // txtReleaseYear
+            // lblProducer
             // 
-            txtReleaseYear.Location = new Point(508, 186);
-            txtReleaseYear.Name = "txtReleaseYear";
-            txtReleaseYear.Size = new Size(53, 27);
-            txtReleaseYear.TabIndex = 8;
+            lblProducer.AutoSize = true;
+            lblProducer.Location = new Point(296, 311);
+            lblProducer.Name = "lblProducer";
+            lblProducer.Size = new Size(71, 20);
+            lblProducer.TabIndex = 2;
+            lblProducer.Text = "Producer:";
             // 
-            // label6
+            // txtDirector
             // 
-            label6.AutoSize = true;
-            label6.Location = new Point(366, 278);
-            label6.Name = "label6";
-            label6.Size = new Size(47, 20);
-            label6.TabIndex = 7;
-            label6.Text = "Műfaj";
+            txtDirector.Location = new Point(386, 259);
+            txtDirector.Name = "txtDirector";
+            txtDirector.Size = new Size(137, 27);
+            txtDirector.TabIndex = 3;
             // 
-            // label8
+            // txtProducer
             // 
-            label8.AutoSize = true;
-            label8.Location = new Point(366, 340);
-            label8.Name = "label8";
-            label8.Size = new Size(42, 20);
-            label8.TabIndex = 7;
-            label8.Text = "Aktív";
+            txtProducer.Location = new Point(386, 308);
+            txtProducer.Name = "txtProducer";
+            txtProducer.Size = new Size(137, 27);
+            txtProducer.TabIndex = 3;
+            // 
+            // lblIsActive
+            // 
+            lblIsActive.AutoSize = true;
+            lblIsActive.Location = new Point(296, 360);
+            lblIsActive.Name = "lblIsActive";
+            lblIsActive.Size = new Size(45, 20);
+            lblIsActive.TabIndex = 2;
+            lblIsActive.Text = "Aktív:";
             // 
             // cmbGenre
             // 
+            cmbGenre.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbGenre.FormattingEnabled = true;
-            cmbGenre.Location = new Point(508, 278);
+            cmbGenre.Location = new Point(99, 259);
             cmbGenre.Name = "cmbGenre";
-            cmbGenre.Size = new Size(151, 28);
-            cmbGenre.TabIndex = 10;
+            cmbGenre.Size = new Size(135, 28);
+            cmbGenre.TabIndex = 5;
             // 
-            // chkActive
+            // numDuration
             // 
-            chkActive.AutoSize = true;
-            chkActive.Location = new Point(508, 340);
-            chkActive.Name = "chkActive";
-            chkActive.Size = new Size(37, 24);
-            chkActive.TabIndex = 9;
-            chkActive.Text = "-";
-            chkActive.UseVisualStyleBackColor = true;
+            numDuration.Location = new Point(99, 309);
+            numDuration.Maximum = new decimal(new int[] { 300, 0, 0, 0 });
+            numDuration.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numDuration.Name = "numDuration";
+            numDuration.Size = new Size(135, 27);
+            numDuration.TabIndex = 6;
+            numDuration.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
-            // btnLoadFilms
+            // numReleaseYear
             // 
-            btnLoadFilms.Location = new Point(366, 407);
-            btnLoadFilms.Name = "btnLoadFilms";
-            btnLoadFilms.Size = new Size(80, 29);
-            btnLoadFilms.TabIndex = 11;
-            btnLoadFilms.Text = "Betöltés";
-            btnLoadFilms.UseVisualStyleBackColor = true;
-            btnLoadFilms.Click += btnLoadFilms_Click;
+            numReleaseYear.Location = new Point(99, 358);
+            numReleaseYear.Maximum = new decimal(new int[] { 2100, 0, 0, 0 });
+            numReleaseYear.Minimum = new decimal(new int[] { 1900, 0, 0, 0 });
+            numReleaseYear.Name = "numReleaseYear";
+            numReleaseYear.Size = new Size(135, 27);
+            numReleaseYear.TabIndex = 6;
+            numReleaseYear.Value = new decimal(new int[] { 1900, 0, 0, 0 });
             // 
-            // btnNew
+            // cmbAgeLimit
             // 
-            btnNew.Location = new Point(452, 407);
-            btnNew.Name = "btnNew";
-            btnNew.Size = new Size(78, 29);
-            btnNew.TabIndex = 11;
-            btnNew.Text = "Új film";
-            btnNew.UseVisualStyleBackColor = true;
-            btnNew.Click += btnNew_Click;
+            cmbAgeLimit.FormattingEnabled = true;
+            cmbAgeLimit.Location = new Point(386, 211);
+            cmbAgeLimit.Name = "cmbAgeLimit";
+            cmbAgeLimit.Size = new Size(137, 28);
+            cmbAgeLimit.TabIndex = 7;
+            // 
+            // lblActors
+            // 
+            lblActors.AutoSize = true;
+            lblActors.Location = new Point(571, 215);
+            lblActors.Name = "lblActors";
+            lblActors.Size = new Size(75, 20);
+            lblActors.TabIndex = 2;
+            lblActors.Text = "Színészek:";
+            // 
+            // chkIsActive
+            // 
+            chkIsActive.AutoSize = true;
+            chkIsActive.Location = new Point(386, 359);
+            chkIsActive.Name = "chkIsActive";
+            chkIsActive.Size = new Size(37, 24);
+            chkIsActive.TabIndex = 8;
+            chkIsActive.Text = "-";
+            chkIsActive.UseVisualStyleBackColor = true;
+            // 
+            // rtbActors
+            // 
+            rtbActors.Location = new Point(652, 212);
+            rtbActors.Name = "rtbActors";
+            rtbActors.Size = new Size(136, 75);
+            rtbActors.TabIndex = 9;
+            rtbActors.Text = "";
+            // 
+            // lblDescription
+            // 
+            lblDescription.AutoSize = true;
+            lblDescription.Location = new Point(571, 311);
+            lblDescription.Name = "lblDescription";
+            lblDescription.Size = new Size(50, 20);
+            lblDescription.TabIndex = 2;
+            lblDescription.Text = "Leírás:";
+            // 
+            // rtbDescription
+            // 
+            rtbDescription.Location = new Point(652, 308);
+            rtbDescription.Name = "rtbDescription";
+            rtbDescription.ScrollBars = RichTextBoxScrollBars.Vertical;
+            rtbDescription.Size = new Size(136, 77);
+            rtbDescription.TabIndex = 9;
+            rtbDescription.Text = "";
+            // 
+            // lstFilmek
+            // 
+            lstFilmek.FormattingEnabled = true;
+            lstFilmek.Location = new Point(12, 20);
+            lstFilmek.Name = "lstFilmek";
+            lstFilmek.Size = new Size(399, 184);
+            lstFilmek.TabIndex = 10;
+            lstFilmek.Click += lstFilmek_SelectedIndexChanged;
             // 
             // btnDelete
             // 
-            btnDelete.Location = new Point(625, 407);
+            btnDelete.Location = new Point(434, 391);
             btnDelete.Name = "btnDelete";
-            btnDelete.Size = new Size(63, 29);
+            btnDelete.Size = new Size(135, 57);
             btnDelete.TabIndex = 11;
             btnDelete.Text = "Törlés";
             btnDelete.UseVisualStyleBackColor = true;
             btnDelete.Click += btnDelete_Click;
             // 
+            // btnNew
+            // 
+            btnNew.Location = new Point(619, 391);
+            btnNew.Name = "btnNew";
+            btnNew.Size = new Size(133, 57);
+            btnNew.TabIndex = 11;
+            btnNew.Text = "Új film";
+            btnNew.UseVisualStyleBackColor = true;
+            btnNew.Click += btnNew_Click;
+            // 
             // btnSave
             // 
-            btnSave.Location = new Point(536, 407);
+            btnSave.Location = new Point(243, 391);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(83, 29);
+            btnSave.Size = new Size(135, 57);
             btnSave.TabIndex = 11;
             btnSave.Text = "Mentés";
             btnSave.UseVisualStyleBackColor = true;
             btnSave.Click += btnSave_Click;
             // 
-            // btnBack
+            // btnClose
             // 
-            btnBack.Location = new Point(694, 407);
-            btnBack.Name = "btnBack";
-            btnBack.Size = new Size(70, 29);
-            btnBack.TabIndex = 11;
-            btnBack.Text = "Vissza";
-            btnBack.UseVisualStyleBackColor = true;
-            btnBack.Click += btnBack_Click;
+            btnClose.BackgroundImage = Properties.Resources.left;
+            btnClose.BackgroundImageLayout = ImageLayout.Zoom;
+            btnClose.Location = new Point(48, 391);
+            btnClose.Name = "btnClose";
+            btnClose.Size = new Size(137, 57);
+            btnClose.TabIndex = 11;
+            btnClose.Text = "Vissza";
+            btnClose.UseVisualStyleBackColor = true;
+            btnClose.Click += btnClose_Click;
             // 
             // FilmEditorForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnClose);
             Controls.Add(btnSave);
-            Controls.Add(btnDelete);
             Controls.Add(btnNew);
-            Controls.Add(btnBack);
-            Controls.Add(btnLoadFilms);
+            Controls.Add(btnDelete);
+            Controls.Add(lstFilmek);
+            Controls.Add(rtbDescription);
+            Controls.Add(rtbActors);
+            Controls.Add(chkIsActive);
+            Controls.Add(cmbAgeLimit);
+            Controls.Add(numReleaseYear);
+            Controls.Add(numDuration);
             Controls.Add(cmbGenre);
-            Controls.Add(chkActive);
-            Controls.Add(txtReleaseYear);
-            Controls.Add(label8);
-            Controls.Add(label6);
-            Controls.Add(label4);
-            Controls.Add(txtDuration);
-            Controls.Add(label3);
-            Controls.Add(txtDescription);
-            Controls.Add(label2);
+            Controls.Add(lblReleaseYear);
+            Controls.Add(lblDuration);
+            Controls.Add(lblGenre);
+            Controls.Add(txtProducer);
+            Controls.Add(txtDirector);
             Controls.Add(txtTitle);
-            Controls.Add(label1);
-            Controls.Add(listBoxFilmek);
+            Controls.Add(lblDescription);
+            Controls.Add(lblActors);
+            Controls.Add(lblIsActive);
+            Controls.Add(lblProducer);
+            Controls.Add(lblDirector);
+            Controls.Add(lblAgeLimit);
+            Controls.Add(lblTitle);
+            Controls.Add(pbFilmImage);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "FilmEditorForm";
-            Text = "FilmEditorForm";
-            Load += FilmEditorForm_Load;
+            Text = "Filmek";
+            ((System.ComponentModel.ISupportInitialize)pbFilmImage).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numDuration).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numReleaseYear).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private ListBox listBoxFilmek;
-        private Label label1;
+        private ListBox listBox1;
+        private PictureBox pbFilmImage;
+        private Label lblTitle;
         private TextBox txtTitle;
-        private Label label2;
-        private TextBox txtDescription;
-        private Label label3;
-        private TextBox txtDuration;
-        private Label label4;
-        private TextBox txtReleaseYear;
-        private Label label6;
-        private Label label8;
+        private Label lblGenre;
+        private Label lblDuration;
+        private Label lblReleaseYear;
+        private Label lblAgeLimit;
+        private Label lblDirector;
+        private Label lblProducer;
+        private TextBox txtDirector;
+        private TextBox txtProducer;
+        private Label lblIsActive;
         private ComboBox cmbGenre;
-        private CheckBox chkActive;
-        private Button btnLoadFilms;
-        private Button btnNew;
+        private NumericUpDown numDuration;
+        private NumericUpDown numReleaseYear;
+        private ComboBox cmbAgeLimit;
+        private Label lblActors;
+        private CheckBox chkIsActive;
+        private RichTextBox rtbActors;
+        private Label lblDescription;
+        private RichTextBox rtbDescription;
+        private ListBox lstFilmek;
         private Button btnDelete;
+        private Button btnNew;
         private Button btnSave;
-        private Button btnBack;
+        private Button btnClose;
     }
 }

@@ -4,7 +4,7 @@
     {
         private readonly ApiClient _api;
 
-        public LoginForm() 
+        public LoginForm()
         {
             this.Text = "test";
             InitializeComponent();
@@ -51,6 +51,11 @@
             var main = new MainForm();
             main.Show();
             this.Hide(); // vagy this.Close(); (lásd lent)
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 
