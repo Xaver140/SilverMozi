@@ -20,7 +20,7 @@
 
             try
             {
-                MessageBox.Show("CLICK OK");
+                
 
                 var req = new LoginReq
                 {
