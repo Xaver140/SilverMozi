@@ -5,10 +5,10 @@ import authMiddleware from "../middleware/authmiddleware.js";
 const router = express.Router();
 
 router.post("/", authMiddleware, async (req, res) => {
-  const { konyveles_ids, amount, method } = req.body;
+  const { konyveles_id, amount, method } = req.body;
 
   try {
-    for (const id of konyveles_ids) {
+    for (const id of konyveles_id) {
       await db.query(`
         INSERT INTO fizetes (konyveles_id, amount, method, status)
         VALUES (?, ?, ?, 'completed')
@@ -23,7 +23,13 @@ router.post("/", authMiddleware, async (req, res) => {
     res.json({ message: "Fizetés sikeres" });
 
   } catch (err) {
-    res.status(500).json({ error: "Fizetési hiba" });
+    console.error("FIZETÉS HIBA:", err);
+    console.error("SQL:", err.sqlMessage);
+  
+    res.status(500).json({
+      error: err.message,
+      sql: err.sqlMessage
+    });
   }
 });
 

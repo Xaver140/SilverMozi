@@ -16,11 +16,9 @@ body {
   border-radius: 14px;
   color: #e5e7eb;
 }
-
 .film-title:hover {
   color: #38bdf8;
 }
-
 .nav-hover {
   position: relative;
   transition: 0.3s;

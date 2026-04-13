@@ -20,21 +20,21 @@ router.post("/", authMiddleware, async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    const insertedIds = []; // 🔥 EZ KELL
+    const insertedIds = [];
 
     for (const ules_id of ules_ids) {
       const [result] = await conn.query(`
         INSERT INTO konyveles (vetites_id, user_id, ules_id, final_price, status) VALUES (?, ?, ?, ?, 'reserved')
       `, [vetites_id, req.user.user_id, ules_id, final_price]);
 
-      insertedIds.push(result.insertId); // 🔥
+      insertedIds.push(result.insertId);
     }
 
     await conn.commit();
 
     res.json({
       message: "Foglalás sikeres",
-      konyveles_ids: insertedIds // 🔥 FRONTENDNEK
+      konyveles_ids: insertedIds
     });
 
   } catch (err) {
@@ -45,6 +45,7 @@ router.post("/", authMiddleware, async (req, res) => {
     conn.release();
   }
 });
+//
 router.delete("/cancel", authMiddleware, async (req, res) => {
   const { konyveles_ids } = req.body;
 
